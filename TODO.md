@@ -3,6 +3,7 @@ Todo
 
 Symfony Server (2.8 LTS)
 ------------------------
+```
 Vendors
   https://github.com/Wisembly/elephant.io
 Controller
@@ -23,18 +24,23 @@ Entity
 Command
   StartServer # start the socket.io server + Emit "CreateChannel" message for every Webhook entities
   StopServer # stop the socket.io server
+```
 
 Socket.io Server
 ----------------
+
+```
   Events
     CreateChannel # Add a channel
     GetConfigurationFromHash(hash) # Return configuration (hash, endpoint)
     SubscribeChannel # Link a client to a channel
     UnsubscribeChannel # Unlink a client to a channel
     EmitNotification # Emit a notification to every subscribed channels
+```
 
 Client
 ------
+```
   Vendors
     https://github.com/Wisembly/elephant.io
     guzzle
@@ -48,3 +54,4 @@ Client
       - emit "SubscribeChannel" message (hash, id)
       - handle "Notification" message (then execute Guzzle requests)
     stop # emit "UnsubscribeChannel" message
+```
