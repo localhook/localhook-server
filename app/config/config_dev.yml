@@ -32,3 +32,11 @@ monolog:
 
 #swiftmailer:
 #    delivery_address: me@example.com
+
+hautelook_alice:
+    db_drivers:
+        orm: ~
+    locale: en_US
+    seed: 1             # A seed to make sure faker generates data consistently across runs, set to null to disable
+    persist_once: false # Only persist objects once if multiple files are passed
+    loading_limit: 5    # Maximum number of time the loader will try to load the files passed
