@@ -1,0 +1,5 @@
+AppBundle\Entity\WebHook:
+    web_hook_{1..10}:
+        endpoint: webhook_<current()>
+        privateKey: ---------------------------------------<current()>
+        username: user
