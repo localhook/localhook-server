@@ -14,4 +14,10 @@
 /vendor/
 /bin/
 /composer.phar
+
+# Sqlite DB
 /app/data.db3
+
+# Socket IO
+
+/src/AppBundle/Resources/SocketIo/node_modules
