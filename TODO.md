@@ -76,19 +76,28 @@ Socket.io Server
 ### Client
 
 #### Vendors
+
 - [ ] https://github.com/Wisembly/elephant.io
 - [ ] guzzle
+
 #### Commands
-configure-channel
+
+**php app/console configure-channel**
+
   - [ ] Ask hash
   - [ ] Emit "GetConfigurationFromHash" message
   - [ ] Handle error (not found)
   - [ ] Store configuration in a local yaml file
-run
+
+**php app/console run*
+
   - [ ] emit "SubscribeChannel" message (hash, id)
   - [ ] handle "Notification" message (then execute Guzzle requests)
-stop
+
+**php app/console stop*
+
   - [ ] emit "UnsubscribeChannel" message
 
-#### Install via composer
-- [ ] composer global require
+#### Install via composer (global)
+
+- [ ] composer global require lucascherifi/localhook-client
