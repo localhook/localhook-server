@@ -38,11 +38,11 @@ TODO LIST
 
 ### Entity
 
-[x] Webhook
-- [x] id
-- [x] private_key
-- [x] endpoint
-- [ ] userRole
+- [x] Webhook
+    - [x] id
+    - [x] private_key
+    - [x] endpoint
+    - [ ] userRole
 
 ### Command
 
