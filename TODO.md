@@ -61,8 +61,7 @@ TODO LIST
 - [ ] autogenerate private key
 
 
-Socket.io Server
-----------------
+## Socket.io Server
 
 ### Events
 
@@ -73,7 +72,8 @@ Socket.io Server
 - [ ] subscribe_channel # Link a client to a channel
 - [ ] unsubscribe_channel # Unlink a client to a channel
 
-### Client
+PHP Client
+----------
 
 #### Vendors
 
