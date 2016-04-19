@@ -1,14 +1,13 @@
 [WIP]
 
-Todo
-====
+TODO LIST
+=========
 
-Symfony Server (2.8 LTS)
-------------------------
+- [x] Symfony Server (2.8 LTS)
 
 ### Vendors
 
-[x] https://github.com/Wisembly/elephant.io
+- [x] https://github.com/Wisembly/elephant.io
 
 ### Controller
 
@@ -17,14 +16,13 @@ Symfony Server (2.8 LTS)
 ##### ListAction
 - [x] List all webhooks
 - [ ] ADMIN_ROLE
-[ ] NewAction # USER_ROLE
-[ ] AddAction # USER_ROLE / Emit "CreateChannel" message
-[ ] EditAction # USER_ROLE
-[ ] DeleteAction # USER_ROLE
+- [ ] NewAction # USER_ROLE
+- [ ] AddAction # USER_ROLE / Emit "CreateChannel" message
+- [ ] EditAction # USER_ROLE
+- [ ] DeleteAction # USER_ROLE
 
 ##### NotificationController
-[x] NotificationsAction
-- ANONYMOUS_ROLE
+- [x] NotificationsAction # ANONYMOUS_ROLE
 
 ### Entity
 
@@ -51,18 +49,18 @@ Socket.io Server
 
 ### Events
 
-[x] create_channel # Add a channel
-[x] transfer_notification # Emit a notification to every subscribed client of a specific channel
+- [x] create_channel # Add a channel
+- [x] transfer_notification # Emit a notification to every subscribed client of a specific channel
 
-[ ] retrieve_configuration_from_private_key(private_key) # Return configuration (private_key, endpoint)
-[ ] subscribe_channel # Link a client to a channel
-[ ] unsubscribe_channel # Unlink a client to a channel
+- [ ] retrieve_configuration_from_private_key(private_key) # Return configuration (private_key, endpoint)
+- [ ] subscribe_channel # Link a client to a channel
+- [ ] unsubscribe_channel # Unlink a client to a channel
 
 ### Client
 
 #### Vendors
-[ ] https://github.com/Wisembly/elephant.io
-[ ] guzzle
+- [ ] https://github.com/Wisembly/elephant.io
+- [ ] guzzle
 #### Commands
 configure-channel
   - [ ] Ask hash
@@ -76,7 +74,7 @@ stop
   - [ ] emit "UnsubscribeChannel" message
 
 #### Install via composer
-[ ] composer global require
+- [ ] composer global require
 
 Server install process
 ----------------------
