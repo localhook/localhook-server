@@ -15,6 +15,8 @@ io.on('connection', function (socket) {
 
     //logger.info('SocketIO > Connected socket ' + socket.id);
 
+    // Server events
+
     socket.on('create_channel', function (message) {
         ++nb;
         logger.info('Init Channel "' + message.endpoint + '" (' + message.privateKey + ')');
@@ -27,10 +29,30 @@ io.on('connection', function (socket) {
         // TODO forward to consumers
     });
 
-    socket.on('disconnect', function () {
-        //logger.info('SocketIO : Received ' + nb + ' messages');
-        //logger.info('SocketIO > Disconnected socket ' + socket.id);
+    // Client Events
+
+    socket.on('retrieve_configuration_from_private_key', function (message) {
+        ++nb;
+        logger.info('configuration retrieved: ' + JSON.stringify(message));
+        // TODO forward to consumer
     });
+
+    socket.on('subscribe_channel', function (message) {
+        ++nb;
+        logger.info('Channel subscription: ' + JSON.stringify(message));
+        // TODO forward to consumer
+    });
+
+    socket.on('unsubscribe_channel', function (message) {
+        ++nb;
+        logger.info('Channel unsubscription: ' + JSON.stringify(message));
+        // TODO forward to consumer
+    });
+
+    // socket.on('disconnect', function () {
+    //     logger.info('SocketIO : Received ' + nb + ' messages');
+    //     logger.info('SocketIO > Disconnected socket ' + socket.id);
+    // });
 });
 
 server.listen(port);
