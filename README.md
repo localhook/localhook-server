@@ -68,15 +68,16 @@ Install
 
 Start
 -----
-Socket IO server:
+
+### Socket IO server:
 
 - cd src/AppBundle/Resources/SocketIo && node server.js
 
-Admin interface:
+### Run tests:
+
+- phpunit -c app
+
+### Admin interface:
 
 - php app/console server:run
 - open http://localhost:8000/app_dev.php/
-
-Run tests:
-
-- phpunit -c app
