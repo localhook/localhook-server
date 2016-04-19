@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Command;
+namespace AppBundle\Command\Server;
 
 use AppBundle\Entity\WebHook;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -14,7 +14,7 @@ class CreateChannelCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('app:create-channel')
+            ->setName('app:server:create-channel')
             ->addArgument('endpoint', InputArgument::REQUIRED, 'The name of the endpoint.')
             ->addArgument('private_key', InputArgument::REQUIRED, 'The private key (40 chars).')
             ->setDescription('Start the socket IO server');
@@ -35,8 +35,7 @@ class CreateChannelCommand extends ContainerAwareCommand
         $em->flush();
 
         $socketIoConnector->createChannel($webHook);
-
-        $io->comment('Channel created: ' . $webHook->getId());
+        $io->comment('Channel created: ' . $webHook->getEndpoint());
         $socketIoConnector->closeConnection();
     }
 }
