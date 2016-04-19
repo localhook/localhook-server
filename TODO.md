@@ -54,4 +54,6 @@ Client
       - emit "SubscribeChannel" message (hash, id)
       - handle "Notification" message (then execute Guzzle requests)
     stop # emit "UnsubscribeChannel" message
+  Install
+    composer global require
 ```
