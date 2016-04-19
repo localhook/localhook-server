@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class NotificationControllerTest extends WebTestCase
 {
-    public function testIndex()
+    public function testHandleAction()
     {
         $client = static::createClient();
 
