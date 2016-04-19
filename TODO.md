@@ -89,12 +89,12 @@ Socket.io Server
   - [ ] Handle error (not found)
   - [ ] Store configuration in a local yaml file
 
-**php app/console run*
+**php app/console run**
 
   - [ ] emit "SubscribeChannel" message (hash, id)
   - [ ] handle "Notification" message (then execute Guzzle requests)
 
-**php app/console stop*
+**php app/console stop**
 
   - [ ] emit "UnsubscribeChannel" message
 
