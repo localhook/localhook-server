@@ -6,3 +6,5 @@ parameters:
 services:
     socket_io_connector:
         class: AppBundle\SocketIoConnector
+        arguments:
+          - "@doctrine.orm.default_entity_manager"
