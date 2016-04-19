@@ -6,21 +6,34 @@ Installation guide
 ------------------
 
 - clone this project
-- cd src/AppBundle/Resources/SocketIo && npm install
-- php app/console d:d:c && php app/console d:s:u --force && php app/console h:d:f:l -n
+```bash
+cd src/AppBundle/Resources/SocketIo && npm install
+```
+
+```bash
+php app/console d:d:c
+php app/console d:s:u --force
+php app/console h:d:f:l -n
+```
 
 Start the app!
 --------------
 
 ### Socket IO server:
 
-- cd src/AppBundle/Resources/SocketIo && node server.js
+```bash
+cd src/AppBundle/Resources/SocketIo && node server.js
+```
 
 ### Run tests:
 
-- phpunit -c app
+```bash
+phpunit -c app
+```
 
 ### Admin interface:
 
-- php app/console server:run
-- open http://localhost:8000/app_dev.php/
+```bash
+php app/console server:run
+open http://localhost:8000/app_dev.php/
+```
