@@ -5,63 +5,82 @@ Todo
 
 Symfony Server (2.8 LTS)
 ------------------------
-```
-Vendors
-  https://github.com/Wisembly/elephant.io
-Controller
-  AdminController
-    ListAction # List all webhooks # ADMIN_ROLE
-    NewAction # USER_ROLE
-    AddAction # USER_ROLE / Emit "CreateChannel" message
-    EditAction # USER_ROLE
-    DeleteAction # USER_ROLE
-  NotificationController
-    NotificationsAction # ANONYMOUS_ROLE
-Entity
-  Webhook
-    id
-    hash
-    endpoint
-    userRole
-Command
-  StartServer # start the socket.io server + Emit "CreateChannel" message for every Webhook entities
-  StopServer # stop the socket.io server
-```
+
+### Vendors
+
+[x] https://github.com/Wisembly/elephant.io
+
+### Controller
+
+#### AdminController
+
+##### ListAction
+- [x] List all webhooks
+- [ ] ADMIN_ROLE
+[ ] NewAction # USER_ROLE
+[ ] AddAction # USER_ROLE / Emit "CreateChannel" message
+[ ] EditAction # USER_ROLE
+[ ] DeleteAction # USER_ROLE
+
+##### NotificationController
+[x] NotificationsAction
+- ANONYMOUS_ROLE
+
+### Entity
+
+[x] Webhook
+- [x] id
+- [x] private_key
+- [x] endpoint
+- [ ] userRole
+
+### Command
+
+app:start
+- [ ] start the socket.io server
+- [x] Emit "CreateChannel" message for every Webhook entities
+app:stop
+- [ ] stop the socket.io server
+app:create-channel
+- [x] create a channel with command line
+- [ ] autogenerate private key
+
 
 Socket.io Server
 ----------------
 
-```
-  Events
-    CreateChannel # Add a channel
-    GetConfigurationFromHash(hash) # Return configuration (hash, endpoint)
-    SubscribeChannel # Link a client to a channel
-    UnsubscribeChannel # Unlink a client to a channel
-    EmitNotification # Emit a notification to every subscribed channels
-```
+### Events
 
-Client
-------
-```
-  Vendors
-    https://github.com/Wisembly/elephant.io
-    guzzle
-  Commands
-    configure-channel
-      - Ask hash
-      - Emit "GetConfigurationFromHash" message
-      - Handle error (not found)
-      - Store configuration in a local yaml file
-    run
-      - emit "SubscribeChannel" message (hash, id)
-      - handle "Notification" message (then execute Guzzle requests)
-    stop # emit "UnsubscribeChannel" message
-  Install
-    composer global require
-```
+[x] create_channel # Add a channel
+[x] transfer_notification # Emit a notification to every subscribed client of a specific channel
 
-Install
--------
+[ ] retrieve_configuration_from_private_key(private_key) # Return configuration (private_key, endpoint)
+[ ] subscribe_channel # Link a client to a channel
+[ ] unsubscribe_channel # Unlink a client to a channel
+
+### Client
+
+#### Vendors
+[ ] https://github.com/Wisembly/elephant.io
+[ ] guzzle
+#### Commands
+configure-channel
+  - [ ] Ask hash
+  - [ ] Emit "GetConfigurationFromHash" message
+  - [ ] Handle error (not found)
+  - [ ] Store configuration in a local yaml file
+run
+  - [ ] emit "SubscribeChannel" message (hash, id)
+  - [ ] handle "Notification" message (then execute Guzzle requests)
+stop
+  - [ ] emit "UnsubscribeChannel" message
+
+#### Install via composer
+[ ] composer global require
+
+Server install process
+----------------------
+
 - clone this project
 - cd src/AppBundle/Resources/SocketIo && npm install
 - php app/console d:d:c && php app/console d:s:u --force && php app/console h:d:f:l -n
