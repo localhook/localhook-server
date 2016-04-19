@@ -36,7 +36,7 @@ TODO LIST
 - [x] NotificationsAction
     - [x] ANONYMOUS_ROLE
 
-### Entity
+### Entities
 
 - [x] Webhook
     - [x] id
@@ -44,14 +44,19 @@ TODO LIST
     - [x] endpoint
     - [ ] userRole
 
-### Command
+### Commands
 
-app:start
+**app:start**
+
 - [ ] start the socket.io server
 - [x] Emit "CreateChannel" message for every Webhook entities
-app:stop
+
+**app:stop**
+
 - [ ] stop the socket.io server
-app:create-channel
+
+**app:create-channel**
+
 - [x] create a channel with command line
 - [ ] autogenerate private key
 
