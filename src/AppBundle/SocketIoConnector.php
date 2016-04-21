@@ -19,10 +19,14 @@ class SocketIoConnector
      */
     private $em;
 
-    public function __construct(EntityManager $em)
+    /** @var string */
+    private $socketIoPort;
+
+    public function __construct(EntityManager $em, $socketIoPort)
     {
 
         $this->em = $em;
+        $this->socketIoPort = $socketIoPort;
     }
 
     /**
@@ -31,7 +35,7 @@ class SocketIoConnector
     public function ensureConnection()
     {
         if (!$this->client) {
-            $this->client = new Client(new Version1X('http://localhost:1337'));
+            $this->client = new Client(new Version1X('http://localhost:' . $this->socketIoPort));
             $this->client->initialize();
         }
 

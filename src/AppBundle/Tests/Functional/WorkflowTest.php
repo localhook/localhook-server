@@ -9,6 +9,9 @@ use Symfony\Component\Process\Process;
 
 class WorkflowTest extends KernelTestCase
 {
+    /** @var string */
+    private $socketIoPort;
+
     /**
      * {@inheritDoc}
      */
@@ -27,7 +30,7 @@ class WorkflowTest extends KernelTestCase
      */
     protected function tearDown()
     {
-        self::killExistingSocketIoServer();
+        $this->killExistingSocketIoServer();
     }
 
     public static function dump($var)
@@ -35,10 +38,11 @@ class WorkflowTest extends KernelTestCase
         fwrite(STDERR, print_r($var, true));
     }
 
-    public static function killExistingSocketIoServer()
+    private function killExistingSocketIoServer()
     {
         // Kill node if already started
-        $checkNodeStarted = `lsof -n -i4TCP:1337 | grep LISTEN`;
+        $command = 'lsof -n -i4TCP:' . $this->socketIoPort . ' | grep LISTEN';
+        $checkNodeStarted = `$command`;
         if (strlen($checkNodeStarted) > 0) {
             $checkNodeStarted = preg_replace('/\s+/', ' ', $checkNodeStarted);
             $checkNodeStarted = explode(' ', $checkNodeStarted);
@@ -49,10 +53,12 @@ class WorkflowTest extends KernelTestCase
 
     public function testFullProcess()
     {
-        self::killExistingSocketIoServer();
-
         $kernel = $this->createKernel();
         $kernel->boot();
+        
+        $this->socketIoPort = $kernel->getContainer()->getParameter('socket_io_port');
+
+        $this->killExistingSocketIoServer();
 
         $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
         $socketIoServerProcess->setTimeout(null)->start();

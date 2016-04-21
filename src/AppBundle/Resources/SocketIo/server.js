@@ -1,7 +1,7 @@
 var server = require('http').createServer(),
     io = require('socket.io')(server),
     logger = require('winston'),
-    port = 1337;
+    port = process.env.SOCKET_IO_PORT;
 
 // Logger config
 logger.remove(logger.transports.Console);

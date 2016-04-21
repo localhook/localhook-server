@@ -23,8 +23,9 @@ class RunSocketIoCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io = new SymfonyStyle($input, $output);
+        $socketIoPort = $this->getContainer()->getParameter('socket_io_port');
 
-        $process = new Process('node src/AppBundle/Resources/SocketIo/server.js');
+        $process = new Process('SOCKET_IO_PORT=' . $socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js');
         $process->setTimeout(null)->start();
 
         $process->wait(function ($type, $buffer) {
