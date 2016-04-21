@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ea658c01659be98c89a0e23bd18d8b86",
-    "content-hash": "36a2fb7752f64f6eb40c2d8f76ffa900",
+    "hash": "7a02097a8fa90dbaff094785fc9d625e",
+    "content-hash": "61f71d8a324a90a8d96f7034b8c38898",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1037,16 +1037,16 @@
         },
         {
             "name": "lucascherifi/localhook-core",
-            "version": "0.7.12",
+            "version": "0.7.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lucascherifi/localhook-core.git",
-                "reference": "08dab8abe9fb6ea248420413924f46d6c479a4ba"
+                "reference": "804109d11090a4da0bfa658b24238ce68124da2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lucascherifi/localhook-core/zipball/08dab8abe9fb6ea248420413924f46d6c479a4ba",
-                "reference": "08dab8abe9fb6ea248420413924f46d6c479a4ba",
+                "url": "https://api.github.com/repos/lucascherifi/localhook-core/zipball/804109d11090a4da0bfa658b24238ce68124da2e",
+                "reference": "804109d11090a4da0bfa658b24238ce68124da2e",
                 "shasum": ""
             },
             "require": {
@@ -1062,7 +1062,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2016-04-21 21:13:00"
+            "time": "2016-04-21 21:54:41"
         },
         {
             "name": "monolog/monolog",
