@@ -74,11 +74,11 @@ class WorkflowTest extends KernelTestCase
                 if (strpos($buffer, 'Channels successfully created')) {
                     $this->assertContains('Channels successfully created', $buffer);
 
-                    $socketIoConnector = $kernel->getContainer()->get('socket_io_connector')->ensureConnection();
+                    $socketIoClientConnector = $kernel->getContainer()->get('socket_io_client_connector')->ensureConnection();
 
                     // Retrieve configuration
 
-                    $configuration = $socketIoConnector->retrieveConfigurationFromPrivateKey(
+                    $configuration = $socketIoClientConnector->retrieveConfigurationFromPrivateKey(
                         '---------------------------------------1'
                     );
 

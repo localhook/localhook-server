@@ -9,3 +9,8 @@ services:
         arguments:
           - "@doctrine.orm.default_entity_manager"
           - "%socket_io_port%"
+
+    socket_io_client_connector:
+        class: AppBundle\SocketIoClientConnector
+        arguments:
+          - "%socket_io_port%"
