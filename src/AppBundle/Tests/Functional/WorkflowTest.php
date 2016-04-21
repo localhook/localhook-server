@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Functional;
 
+use Doctrine\ORM\Tools\SchemaTool;
+use Nelmio\Alice\Fixtures;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Process\Process;
 
@@ -15,12 +17,16 @@ class WorkflowTest extends KernelTestCase
      */
     protected function setUp()
     {
+        self::bootKernel();
         // TODO Load fixtures
-//        $kernel = $this->createKernel();
-//        $kernel->boot();
-//
-//        $manager = $kernel->getContainer()->get('hautelook_alice.alice.fixtures.loader');
-//        $manager->load(require($kernel->getRootDir().'/../src/AppBundle/DataFixtures/ORM/fixtures.yml'));
+        $em = static::$kernel->getContainer()->get('doctrine.orm.default_entity_manager');
+        $metaData = $em->getMetadataFactory()->getAllMetadata();
+        if (!empty($metaData)) {
+            $tool = new SchemaTool($em);
+            $tool->dropSchema($metaData);
+            $tool->createSchema($metaData);
+            Fixtures::load(static::$kernel->getRootDir().'/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
+        }
     }
 
     /**
@@ -51,16 +57,14 @@ class WorkflowTest extends KernelTestCase
 
     public function testFullProcess()
     {
-        $kernel = $this->createKernel();
-        $kernel->boot();
 
-        $this->socketIoPort = $kernel->getContainer()->getParameter('socket_io_port');
+        $this->socketIoPort = static::$kernel->getContainer()->getParameter('socket_io_port');
 
         $this->killExistingSocketIoServer();
 
         $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
         $socketIoServerProcess->setTimeout(null)->start();
-
+        $kernel = static::$kernel;
         $socketIoServerProcess->wait(function ($type, $buffer) use ($kernel, $socketIoServerProcess) {
             if (Process::ERR === $type) {
                 self::dump('SOCKET IO ERR > ' . $buffer);
