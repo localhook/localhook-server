@@ -25,5 +25,5 @@ security:
             http_basic: ~
 
     access_control:
-        - { path: ^/notifications, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^.*/notifications, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, roles: ROLE_ADMIN }
