@@ -21,7 +21,7 @@ class NotificationController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => $endpoint]);
-        
+
         $this->get('socket_io_connector')->ensureConnection()->forwardNotification($webHook, $request);
 
         return new JsonResponse();

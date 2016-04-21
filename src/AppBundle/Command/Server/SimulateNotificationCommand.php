@@ -19,7 +19,7 @@ class SimulateNotificationCommand extends ContainerAwareCommand
 
     /** @var OutputInterface */
     private $output;
-    
+
     protected function configure()
     {
         $this
