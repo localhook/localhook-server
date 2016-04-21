@@ -29,38 +29,15 @@ class WorkflowTest extends KernelTestCase
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        $this->killExistingSocketIoServer();
-    }
-
     public static function dump($var)
     {
         fwrite(STDERR, print_r($var, true));
-    }
-
-    private function killExistingSocketIoServer()
-    {
-        // Kill node if already started
-        $command = 'lsof -n -i4TCP:' . $this->socketIoPort . ' | grep LISTEN';
-        $checkNodeStarted = `$command`;
-        if (strlen($checkNodeStarted) > 0) {
-            $checkNodeStarted = preg_replace('/\s+/', ' ', $checkNodeStarted);
-            $checkNodeStarted = explode(' ', $checkNodeStarted);
-            $pid = $checkNodeStarted[1];
-            `kill $pid`;
-        }
     }
 
     public function testFullProcess()
     {
 
         $this->socketIoPort = static::$kernel->getContainer()->getParameter('socket_io_port');
-
-        $this->killExistingSocketIoServer();
 
         $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
         $socketIoServerProcess->setTimeout(null)->start();

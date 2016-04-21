@@ -13,6 +13,9 @@ class RunSocketIoCommand extends ContainerAwareCommand
     /** @var SymfonyStyle */
     private $io;
 
+    /** @var string */
+    private $socketIoPort;
+
     protected function configure()
     {
         $this
@@ -23,9 +26,12 @@ class RunSocketIoCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io = new SymfonyStyle($input, $output);
-        $socketIoPort = $this->getContainer()->getParameter('socket_io_port');
+        $this->socketIoPort = $this->getContainer()->getParameter('socket_io_port');
 
-        $process = new Process('SOCKET_IO_PORT=' . $socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js');
+        $this->killExistingSocketIoServer();
+        $command = 'Execute: SOCKET_IO_PORT=' . $this->socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js';
+        $this->io->comment($command);
+        $process = new Process($command);
         $process->setTimeout(null)->start();
 
         $process->wait(function ($type, $buffer) {
@@ -39,6 +45,19 @@ class RunSocketIoCommand extends ContainerAwareCommand
                 }
             }
         });
+    }
+
+    private function killExistingSocketIoServer()
+    {
+        // Kill node if already started
+        $command = 'lsof -n -i4TCP:' . $this->socketIoPort . ' | grep LISTEN';
+        $checkNodeStarted = `$command`;
+        if (strlen($checkNodeStarted) > 0) {
+            $checkNodeStarted = preg_replace('/\s+/', ' ', $checkNodeStarted);
+            $checkNodeStarted = explode(' ', $checkNodeStarted);
+            $pid = $checkNodeStarted[1];
+            `kill $pid`;
+        }
     }
 
     private function initChannels()
