@@ -29,9 +29,9 @@ class WatchNotificationCommand extends ContainerAwareCommand
         $counter = 0;
 
         $output->writeln('Watch for a notification to endpoint ' . $endpoint . ' ...');
-        $socketIoConnector = $this->getContainer()->get('socket_io_connector')->ensureConnection();
+        $socketIoClientConnector = $this->getContainer()->get('socket_io_client_connector')->ensureConnection();
 
-        $socketIoConnector->subscribeChannel($endpoint);
+        $socketIoClientConnector->subscribeChannel($endpoint);
 
         while (true) {
             // apply max limitation
@@ -40,7 +40,7 @@ class WatchNotificationCommand extends ContainerAwareCommand
             }
             $counter++;
 
-            $notification = $socketIoConnector->waitForNotification();
+            $notification = $socketIoClientConnector->waitForNotification();
             $url = 'http://localhost:8000/notifications';
 
             $client = new Client();
@@ -58,6 +58,6 @@ class WatchNotificationCommand extends ContainerAwareCommand
             }
         }
 
-        $socketIoConnector->closeConnection();
+        $socketIoClientConnector->closeConnection();
     }
 }
