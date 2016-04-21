@@ -11,6 +11,6 @@ services:
           - "%socket_io_port%"
 
     socket_io_client_connector:
-        class: AppBundle\SocketIoClientConnector
+        class: Localhook\Core\SocketIoClientConnector
         arguments:
           - "%socket_io_port%"
