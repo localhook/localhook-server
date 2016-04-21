@@ -29,8 +29,8 @@ class RunSocketIoCommand extends ContainerAwareCommand
         $this->socketIoPort = $this->getContainer()->getParameter('socket_io_port');
 
         $this->killExistingSocketIoServer();
-        $command = 'Execute: SOCKET_IO_PORT=' . $this->socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js';
-        $this->io->comment($command);
+        $command = 'SOCKET_IO_PORT=' . $this->socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js';
+        $this->io->comment('Execute: ' . $command);
         $process = new Process($command);
         $process->setTimeout(null)->start();
 

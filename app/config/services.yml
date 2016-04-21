@@ -8,7 +8,7 @@ services:
         class: AppBundle\SocketIoConnector
         arguments:
           - "@doctrine.orm.default_entity_manager"
-          - "%socket_io_port%"
+          - "http://localhost:%socket_io_port%"
 
     socket_io_client_connector:
         class: Localhook\Core\SocketIoClientConnector
