@@ -2,9 +2,7 @@
 
 namespace AppBundle\Tests\Functional;
 
-use AppBundle\SocketIoConnector;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Process;
 
 class WorkflowTest extends KernelTestCase
@@ -55,7 +53,7 @@ class WorkflowTest extends KernelTestCase
     {
         $kernel = $this->createKernel();
         $kernel->boot();
-        
+
         $this->socketIoPort = $kernel->getContainer()->getParameter('socket_io_port');
 
         $this->killExistingSocketIoServer();
