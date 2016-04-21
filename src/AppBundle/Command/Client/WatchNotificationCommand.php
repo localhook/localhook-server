@@ -41,7 +41,7 @@ class WatchNotificationCommand extends ContainerAwareCommand
             $counter++;
 
             $notification = $socketIoClientConnector->waitForNotification();
-            $url = 'http://localhost:8000/notifications';
+            $url = 'http://localhost/notifications';
 
             $client = new Client();
             $request = new Request($notification['method'], $url);
