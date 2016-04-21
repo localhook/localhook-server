@@ -27,7 +27,7 @@ class WorkflowTest extends KernelTestCase
      */
     protected function tearDown()
     {
-        // TODO stop server
+        self::killExistingSocketIoServer();
     }
 
     public static function dump($var)
@@ -35,7 +35,7 @@ class WorkflowTest extends KernelTestCase
         fwrite(STDERR, print_r($var, true));
     }
 
-    public function testFullProcess()
+    public static function killExistingSocketIoServer()
     {
         // Kill node if already started
         $checkNodeStarted = `lsof -n -i4TCP:1337 | grep LISTEN`;
@@ -45,6 +45,11 @@ class WorkflowTest extends KernelTestCase
             $pid = $checkNodeStarted[1];
             `kill $pid`;
         }
+    }
+
+    public function testFullProcess()
+    {
+        self::killExistingSocketIoServer();
 
         $kernel = $this->createKernel();
         $kernel->boot();
@@ -56,10 +61,11 @@ class WorkflowTest extends KernelTestCase
             if (Process::ERR === $type) {
                 self::dump('SOCKET IO ERR > ' . $buffer);
             } else {
-                self::dump($buffer);
+                //self::dump($buffer);
 
                 if (strpos($buffer, 'Channels successfully created')) {
                     $this->assertContains('Channels successfully created', $buffer);
+
                     $socketIoConnector = $kernel->getContainer()->get('socket_io_connector')->ensureConnection();
 
                     // Retrieve configuration
@@ -70,37 +76,32 @@ class WorkflowTest extends KernelTestCase
 
                     $this->assertEquals($configuration['endpoint'], 'webhook_1');
 
-                    // Subscribe channel
-
-                    $socketIoConnector->subscribeChannel($configuration['endpoint']);
-
                     // Start notification watcher
 
                     $watchNotificationProcess = new Process(
-                        'php app/console app:client:watch-notification ' . $configuration['endpoint']
+                        'php app/console app:client:watch-notifications ' . $configuration['endpoint'] . '  --max=1'
                     );
                     $watchNotificationProcess->setTimeout(null)->start();
 
                     // Simulate a notification
 
-                    //
+                    $simulateNotificationProcess = new Process(
+                        'php app/console app:server:simulate-notification'
+                    );
+                    $simulateNotificationProcess->setTimeout(null)->run();
+                    $simulationOutput = $simulateNotificationProcess->getOutput();
 
-                    // get notification watcher data
+                    $this->assertContains('Sent!', $simulationOutput);
 
-                    $watchOutput = $watchNotificationProcess->getIncrementalOutput();
-                    if ($watchOutput) {
-                        self::dump('.............' . $watchOutput);
+                    while ($watchNotificationProcess->isRunning()) {
+                        // waiting for process to finish
+                    }
+                    $watchNotificationOutput = $watchNotificationProcess->getIncrementalOutput();
+                    if (strlen($watchNotificationOutput)) {
+                        $this->assertContains('REQUEST: POST http://localhost:8000/notifications', $watchNotificationOutput);
                     }
 
-                    $watchNotificationProcess->wait(function ($type, $buffer) use ($kernel, $watchNotificationProcess) {
-                        if (Process::ERR === $type) {
-                            self::dump('WATCHER ERR > ' . $buffer);
-                        } else {
-                            self::dump('----------' . $buffer);
-                            //$SocketIoServerProcess->stop(3, SIGINT);
-                        }
-                    });
-
+                    $socketIoServerProcess->signal(SIGKILL);
                 }
             }
         });
