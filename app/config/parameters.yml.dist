@@ -20,3 +20,4 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     basic_auth_password: admin
+    socket_io_port: 1337
