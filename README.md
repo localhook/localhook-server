@@ -6,14 +6,13 @@ Installation guide
 ------------------
 
 - clone this project
-```bash
-cd src/AppBundle/Resources/SocketIo && npm install
-```
 
 ```bash
+composer install
 php app/console d:d:c
 php app/console d:s:u --force
 php app/console h:d:f:l -n
+cd src/AppBundle/Resources/SocketIo && npm install
 ```
 
 Start the app!
