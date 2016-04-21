@@ -21,7 +21,6 @@
         "sensio/distribution-bundle": "~5.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
-        "wisembly/elephant.io": "^3.1",
         "stof/doctrine-extensions-bundle": "^1.2",
         "lucascherifi/localhook-core": "^0.7.10"
     },
