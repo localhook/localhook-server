@@ -106,7 +106,7 @@ class WorkflowTest extends KernelTestCase
                     }
                     $watchNotificationOutput = $watchNotificationProcess->getIncrementalOutput();
                     if (strlen($watchNotificationOutput)) {
-                        $this->assertContains('REQUEST: POST http://localhost:8000/notifications', $watchNotificationOutput);
+                        $this->assertContains('REQUEST: POST ', $watchNotificationOutput);
                     }
 
                     $socketIoServerProcess->signal(SIGKILL);
