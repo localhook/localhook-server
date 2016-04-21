@@ -13,4 +13,4 @@ services:
     socket_io_client_connector:
         class: Localhook\Core\SocketIoClientConnector
         arguments:
-          - "%socket_io_port%"
+          - "http://localhost:%socket_io_port%"
