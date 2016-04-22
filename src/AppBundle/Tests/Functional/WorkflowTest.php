@@ -56,7 +56,7 @@ class WorkflowTest extends KernelTestCase
                     // Retrieve configuration
 
                     $configuration = $socketIoClientConnector->retrieveConfigurationFromPrivateKey(
-                        '---------------------------------------1'
+                        '1----------------------------------'
                     );
 
                     $this->assertEquals($configuration['endpoint'], 'webhook_1');
@@ -71,7 +71,7 @@ class WorkflowTest extends KernelTestCase
                     // Simulate a notification
 
                     $simulateNotificationProcess = new Process(
-                        'php app/console app:server:simulate-notification'
+                        'php app/console app:server:simulate-notification webhook_1'
                     );
                     $simulateNotificationProcess->setTimeout(null)->run();
                     $simulationOutput = $simulateNotificationProcess->getOutput();

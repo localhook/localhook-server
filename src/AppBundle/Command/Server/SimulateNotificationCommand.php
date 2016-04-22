@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,6 +25,7 @@ class SimulateNotificationCommand extends ContainerAwareCommand
     {
         $this
             ->setName('app:server:simulate-notification')
+            ->addArgument('endpoint', InputArgument::REQUIRED, 'The endpoint')
             ->addOption('mode', null, InputOption::VALUE_OPTIONAL, 'The mode to send notification : HTTP / INTERNAL', 'HTTP')
             ->setDescription('Simulate a notification to the socket IO server');
     }
@@ -40,20 +42,25 @@ class SimulateNotificationCommand extends ContainerAwareCommand
         $this->io = new SymfonyStyle($input, $output);
         $this->output = $output;
         $mode = $input->getOption('mode');
+        $endpoint = $input->getArgument('endpoint');
         if ($mode == 'HTTP') {
-            $this->httpExecution();
+            $this->httpExecution($endpoint);
         } elseif ($mode == 'INTERNAL') {
-            $this->internalExecution();
+            $this->internalExecution($endpoint);
         } else {
             throw new \Exception('Invalid mode: please set one of HTTP or INTERNAL values.');
         }
         $this->output->writeln('Sent!');
     }
 
-    private function httpExecution()
+    private function httpExecution($endpoint)
     {
+        $url = 'http://localhost:8000/' . $endpoint . '/notifications?' . http_build_query([
+                'post_param_1' => 'post_value_1',
+                'post_param_2' => 'post_value_2',
+            ]);
         $client = new Client();
-        $request = new GuzzleRequest('POST', 'http://localhost:8000/webhook_1/notifications?get_param_1=get_value_1&get_param_2=get_value_2', [
+        $request = new GuzzleRequest('POST', $url, [
             'json' => [
                 'post_param_1' => 'post_value_1',
                 'post_param_2' => 'post_value_2',
@@ -68,11 +75,11 @@ class SimulateNotificationCommand extends ContainerAwareCommand
         }
     }
 
-    private function internalExecution()
+    private function internalExecution($endpoint)
     {
         $socketIoConnector = $this->getContainer()->get('socket_io_connector')->ensureConnection();
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => 'webhook_1']);
+        $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => $endpoint]);
         $request = new Request();
         $request->query->add(['param_1' => 'value_1', 'param_2' => 'value_2']);
         $request->request->add(['param_1' => 'value_1', 'param_2' => 'value_2']);
