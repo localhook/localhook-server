@@ -58,9 +58,14 @@ io.on('connection', function (socket) {
     socket.on('subscribe_channel', function (message) {
         ++nb;
         var channel = message.channel;
-        socket.join(channel);
-        logger.info(socket.id + ' > Channel subscription: ' + channel + ' for client ' + socket.id);
-        socket.emit('answer_subscribe_channel', {'status': 'ok'});
+        var privateKey = message.privateKey;
+        if (channels[channel]['privateKey'] == privateKey) {
+            socket.join(channel);
+            logger.info(socket.id + ' > Channel subscription: ' + channel + ' for client ' + socket.id);
+            socket.emit('answer_subscribe_channel', {'status': 'ok'});
+        } else {
+            socket.emit('answer_subscribe_channel', {'status': 'error', 'message': 'The private key does not match'});
+        }
     });
 
     socket.on('unsubscribe_channel', function (message) {

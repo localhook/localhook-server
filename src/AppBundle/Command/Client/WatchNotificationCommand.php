@@ -25,13 +25,18 @@ class WatchNotificationCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $endpoint = $input->getArgument('endpoint');
+        $webHook = $this->getContainer()
+                        ->get('doctrine.orm.default_entity_manager')
+                        ->getRepository('AppBundle:WebHook')
+                        ->findOneBy(['endpoint' => $endpoint]);
+        $privateKey = $webHook->getPrivateKey();
         $max = $input->getOption('max');
         $counter = 0;
 
         $output->writeln('Watch for a notification to endpoint ' . $endpoint . ' ...');
         $socketIoClientConnector = $this->getContainer()->get('socket_io_client_connector')->ensureConnection();
 
-        $socketIoClientConnector->subscribeChannel($endpoint);
+        $socketIoClientConnector->subscribeChannel($endpoint, $privateKey);
 
         while (true) {
             // apply max limitation
