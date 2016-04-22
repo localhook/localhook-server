@@ -79,8 +79,10 @@ class SocketIoConnector extends AbstractSocketIoConnector
         $this->client->emit('forward_notification', [
             'webHookEndpoint' => $webHook->getEndpoint(),
             'method'          => $request->getMethod(),
+            'headers'         => $request->headers->all(),
             'query'           => $request->query->all(),
             'request'         => $request->request->all(),
+            //'files'           => $request->files->all(),
         ]);
 
         return $this;
