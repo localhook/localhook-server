@@ -21,7 +21,7 @@ class SocketIoConnector extends AbstractSocketIoConnector
         $this->em = $em;
         parent::__construct($socketIoPort);
     }
-    
+
     /**
      * @param WebHook $webHook
      *
@@ -31,6 +31,22 @@ class SocketIoConnector extends AbstractSocketIoConnector
     public function createChannel(WebHook $webHook)
     {
         $this->emitAndCheck('create_channel', [
+            'endpoint'   => $webHook->getEndpoint(),
+            'privateKey' => $webHook->getPrivateKey(),
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * @param WebHook $webHook
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function deleteChannel(WebHook $webHook)
+    {
+        $this->emitAndCheck('delete_channel', [
             'endpoint'   => $webHook->getEndpoint(),
             'privateKey' => $webHook->getPrivateKey(),
         ]);

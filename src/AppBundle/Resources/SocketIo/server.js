@@ -6,7 +6,7 @@ var server = require('http').createServer(),
 // Logger config
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {colorize: true, timestamp: true});
-logger.info('SocketIO > listening on port ' + port);
+logger.info('SocketIO listening on port ' + port);
 
 var channels = {};
 var clients = [];
@@ -22,15 +22,26 @@ io.on('connection', function (socket) {
 
     socket.on('create_channel', function (message) {
         ++nb;
-        logger.info(socket.id + ' > Init Channel "' + message.endpoint + '" (' + message.privateKey + ')');
+        logger.info(socket.id + ' > Init channel "' + message.endpoint + '" (' + message.privateKey + ')');
         channels[message.endpoint] = {"privateKey": message.privateKey};
         socket.emit('answer_create_channel', {'status': 'ok'});
     });
 
+    socket.on('delete_channel', function (message) {
+        ++nb;
+        logger.info(socket.id + ' > Delete channel "' + message.endpoint + '" (' + message.privateKey + ')');
+        delete channels[message.endpoint];
+        socket.broadcast.to(message.endpoint).emit('deleted_channel', {"endpoint": message.endpoint});
+
+        socket.emit('answer_delete_channel', {'status': 'ok'});
+    });
+
     socket.on('forward_notification', function (message) {
         ++nb;
-        logger.info(socket.id + ' > Notification received: ' + JSON.stringify(message));
-        logger.info(socket.id + ' > clients: ' + JSON.stringify(clients));
+        logger.info(
+            socket.id + ' > Notification received: ' + JSON.stringify(message) +
+            ' forwarded to clients: ' + JSON.stringify(clients)
+        );
         socket.broadcast.to(message.webHookEndpoint).emit('forwarded_notification', {
             "method": message.method,
             "query": message.query,
@@ -52,14 +63,16 @@ io.on('connection', function (socket) {
         }
         var response = {'endpoint': foundWebHook};
         socket.emit('answer_retrieve_configuration_from_private_key', response);
-        logger.info(socket.id + ' > configuration sent for private key ' + message.privateKey + ': ' + JSON.stringify(response));
+        logger.info(
+            socket.id + ' > configuration sent for private key ' + message.privateKey + ': ' + JSON.stringify(response)
+        );
     });
 
     socket.on('subscribe_channel', function (message) {
         ++nb;
         var channel = message.channel;
         var privateKey = message.privateKey;
-        if (channels[channel]['privateKey'] == privateKey) {
+        if (channels[channel] && channels[channel]['privateKey'] == privateKey) {
             socket.join(channel);
             logger.info(socket.id + ' > Channel subscription: ' + channel + ' for client ' + socket.id);
             socket.emit('answer_subscribe_channel', {'status': 'ok'});
