@@ -44,6 +44,7 @@ io.on('connection', function (socket) {
         );
         socket.broadcast.to(message.webHookEndpoint).emit('forwarded_notification', {
             "method": message.method,
+            "headers": message.headers,
             "query": message.query,
             "request": message.request
         });
