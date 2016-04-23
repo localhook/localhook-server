@@ -21,3 +21,4 @@ parameters:
 
     basic_auth_password: admin
     socket_io_port: 1337
+    socket_io_secret: please-change-this-secret

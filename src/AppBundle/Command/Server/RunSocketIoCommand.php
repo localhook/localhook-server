@@ -16,6 +16,9 @@ class RunSocketIoCommand extends ContainerAwareCommand
     /** @var string */
     private $socketIoPort;
 
+    /** @var string */
+    private $socketIoSecret;
+
     protected function configure()
     {
         $this
@@ -27,9 +30,10 @@ class RunSocketIoCommand extends ContainerAwareCommand
     {
         $this->io = new SymfonyStyle($input, $output);
         $this->socketIoPort = $this->getContainer()->getParameter('socket_io_port');
+        $this->socketIoSecret = $this->getContainer()->getParameter('socket_io_secret');
 
         $this->killExistingSocketIoServer();
-        $command = 'SOCKET_IO_PORT=' . $this->socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js';
+        $command = 'SOCKET_IO_SECRET=' . $this->socketIoSecret . ' SOCKET_IO_PORT=' . $this->socketIoPort . ' node src/AppBundle/Resources/SocketIo/server.js';
         $this->io->comment('Execute: ' . $command);
         $process = new Process($command);
         $process->setTimeout(null)->start();

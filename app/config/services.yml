@@ -9,6 +9,7 @@ services:
         arguments:
           - "@doctrine.orm.default_entity_manager"
           - "http://localhost:%socket_io_port%"
+          - "%socket_io_secret%"
 
     socket_io_client_connector:
         class: Kasifi\Localhook\SocketIoClientConnector

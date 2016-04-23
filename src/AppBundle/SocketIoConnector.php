@@ -15,11 +15,17 @@ class SocketIoConnector extends AbstractSocketIoConnector
      */
     private $em;
 
-    public function __construct(EntityManager $em, $socketIoPort)
+    /**
+     * @var string
+     */
+    private $socketIoSecret;
+
+    public function __construct(EntityManager $em, $socketIoServerUrl, $socketIoSecret)
     {
 
         $this->em = $em;
-        parent::__construct($socketIoPort);
+        parent::__construct($socketIoServerUrl);
+        $this->socketIoSecret = $socketIoSecret;
     }
 
     /**
@@ -33,6 +39,7 @@ class SocketIoConnector extends AbstractSocketIoConnector
         $this->emitAndCheck('create_channel', [
             'endpoint'   => $webHook->getEndpoint(),
             'privateKey' => $webHook->getPrivateKey(),
+            'secret'     => $this->socketIoSecret,
         ]);
 
         return $this;
@@ -49,6 +56,7 @@ class SocketIoConnector extends AbstractSocketIoConnector
         $this->emitAndCheck('delete_channel', [
             'endpoint'   => $webHook->getEndpoint(),
             'privateKey' => $webHook->getPrivateKey(),
+            'secret'     => $this->socketIoSecret,
         ]);
 
         return $this;
@@ -77,6 +85,7 @@ class SocketIoConnector extends AbstractSocketIoConnector
     public function forwardNotification(WebHook $webHook, Request $request)
     {
         $this->client->emit('forward_notification', [
+            'secret'          => $this->socketIoSecret,
             'webHookEndpoint' => $webHook->getEndpoint(),
             'method'          => $request->getMethod(),
             'headers'         => $request->headers->all(),

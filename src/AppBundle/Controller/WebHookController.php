@@ -39,6 +39,7 @@ class WebHookController extends Controller
         return $this->render('webhook/index.html.twig', [
             'webHooks'     => $webHooks,
             'delete_forms' => $deleteForms,
+            'socket_io_secret' => $this->getParameter('socket_io_secret')
         ]);
     }
 
@@ -75,6 +76,7 @@ class WebHookController extends Controller
         return $this->render('webhook/new.html.twig', [
             'webHook' => $webHook,
             'form'    => $form->createView(),
+            'socket_io_secret' => $this->getParameter('socket_io_secret')
         ]);
     }
 

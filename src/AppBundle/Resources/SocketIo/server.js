@@ -2,6 +2,7 @@ var server = require('http').createServer(),
     io = require('socket.io')(server),
     logger = require('winston'),
     port = process.env.SOCKET_IO_PORT;
+    secret = process.env.SOCKET_IO_SECRET;
 
 // Logger config
 logger.remove(logger.transports.Console);
@@ -22,6 +23,12 @@ io.on('connection', function (socket) {
 
     socket.on('create_channel', function (message) {
         ++nb;
+
+        if (message.secret != secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
+            logger.error('Wrong secret: '+message.secret);
+        }
+
         logger.info(socket.id + ' > Init channel "' + message.endpoint + '" (' + message.privateKey + ')');
         channels[message.endpoint] = {"privateKey": message.privateKey};
         socket.emit('answer_create_channel', {'status': 'ok'});
@@ -29,6 +36,12 @@ io.on('connection', function (socket) {
 
     socket.on('delete_channel', function (message) {
         ++nb;
+
+        if (message.secret != secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
+            logger.error('Wrong secret: '+message.secret);
+        }
+
         logger.info(socket.id + ' > Delete channel "' + message.endpoint + '" (' + message.privateKey + ')');
         delete channels[message.endpoint];
         socket.broadcast.to(message.endpoint).emit('deleted_channel', {"endpoint": message.endpoint});
@@ -38,6 +51,12 @@ io.on('connection', function (socket) {
 
     socket.on('forward_notification', function (message) {
         ++nb;
+
+        if (message.secret != secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
+            logger.error('Wrong secret: '+message.secret);
+        }
+
         logger.info(
             socket.id + ' > Notification received: ' + JSON.stringify(message) +
             ' forwarded to clients: ' + JSON.stringify(clients)
