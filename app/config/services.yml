@@ -11,6 +11,6 @@ services:
           - "http://localhost:%socket_io_port%"
 
     socket_io_client_connector:
-        class: Localhook\Core\SocketIoClientConnector
+        class: Kasifi\Localhook\SocketIoClientConnector
         arguments:
           - "http://localhost:%socket_io_port%"

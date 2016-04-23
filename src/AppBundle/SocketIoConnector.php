@@ -5,7 +5,7 @@ namespace AppBundle;
 use AppBundle\Entity\WebHook;
 use Doctrine\ORM\EntityManager;
 use Exception;
-use Localhook\Core\AbstractSocketIoConnector;
+use Kasifi\Localhook\AbstractSocketIoConnector;
 use Symfony\Component\HttpFoundation\Request;
 
 class SocketIoConnector extends AbstractSocketIoConnector
