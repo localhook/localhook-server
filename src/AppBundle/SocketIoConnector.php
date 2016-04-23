@@ -6,7 +6,6 @@ use AppBundle\Entity\WebHook;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Kasifi\Localhook\AbstractSocketIoConnector;
-use Symfony\Component\HttpFoundation\Request;
 
 class SocketIoConnector extends AbstractSocketIoConnector
 {
@@ -78,21 +77,18 @@ class SocketIoConnector extends AbstractSocketIoConnector
 
     /**
      * @param WebHook $webHook
-     * @param Request $request
+     * @param array   $requestData
      *
      * @return $this
      */
-    public function forwardNotification(WebHook $webHook, Request $request)
+    public function forwardNotification(WebHook $webHook, array $requestData)
     {
-        $this->client->emit('forward_notification', [
+        $additionalData = [
             'secret'          => $this->socketIoServerSecret,
             'webHookEndpoint' => $webHook->getEndpoint(),
-            'method'          => $request->getMethod(),
-            'headers'         => $request->headers->all(),
-            'query'           => $request->query->all(),
-            'request'         => $request->request->all(),
-            //'files'           => $request->files->all(),
-        ]);
+        ];
+        $notificationData = array_merge($requestData, $additionalData);
+        $this->client->emit('forward_notification', $notificationData);
 
         return $this;
     }

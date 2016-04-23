@@ -3,3 +3,8 @@ AppBundle\Entity\WebHook:
         endpoint: webhook_<current()>
         privateKey: <current()>----------------------------------
         username: admin
+AppBundle\Entity\Notification:
+    notification_{1..100}:
+        webHook: "@web_hook_*"
+        content: |
+          {"headers":{"host":{"localhost"}, "user-agent":{"GuzzleHttp/6.2.0 curl/7.43.0 PHP/7.0.2"}}}

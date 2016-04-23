@@ -16,6 +16,7 @@
             <th>Private key</th>
             <th>Created at</th>
             <th>Updated at</th>
+            <th>Notifications</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -26,6 +27,7 @@
                 <td>{{ webHook.privateKey }}</td>
                 <td>{{ webHook.createdAt|date('Y-m-d H:i:s') }}</td>
                 <td>{{ webHook.updatedAt|date('Y-m-d H:i:s') }}</td>
+                <td>{{ webHook.notifications|length }}</td>
                 <td>
                     {{ form_start(delete_forms[webHook.id]) }}
                     <input class="btn btn-default" type="submit" value="Delete">

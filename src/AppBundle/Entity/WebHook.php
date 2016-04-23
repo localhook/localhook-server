@@ -2,11 +2,11 @@
 
 namespace AppBundle\Entity;
 
-use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Broadcast.
  *
  * @ORM\Table()
  * @ORM\Entity()
@@ -48,6 +48,13 @@ class WebHook
     private $username;
 
     /**
+     * @var Notification[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="Notification", mappedBy="webHook", cascade={"remove"}))
+     *
+     */
+    private $notifications;
+
+    /**
      * @var \DateTime
      *
      * @Gedmo\Timestampable(on="create")
@@ -64,6 +71,11 @@ class WebHook
      *
      */
     private $updatedAt;
+
+    public function __construct()
+    {
+        $this->notifications = new ArrayCollection();
+    }
 
     /**
      * Get id.
@@ -153,5 +165,22 @@ class WebHook
     public function setPrivateKey($privateKey)
     {
         $this->privateKey = $privateKey;
+    }
+
+    /**
+     * @return Notification[]|ArrayCollection
+     */
+    public function getNotifications()
+    {
+        return $this->notifications;
+    }
+
+    /**
+     * @param Notification $notification
+     */
+    public function addNotification($notification)
+    {
+        $this->notifications->add($notification);
+        $notification->setWebHook($this);
     }
 }
