@@ -2,7 +2,8 @@ var server = require('http').createServer(),
     io = require('socket.io')(server),
     logger = require('winston'),
     port = process.env.SOCKET_IO_PORT;
-    secret = process.env.SOCKET_IO_SECRET;
+server_secret = process.env.SOCKET_IO_SERVER_SECRET;
+client_secret = process.env.SOCKET_IO_CLIENT_SECRET;
 
 // Logger config
 logger.remove(logger.transports.Console);
@@ -24,9 +25,9 @@ io.on('connection', function (socket) {
     socket.on('create_channel', function (message) {
         ++nb;
 
-        if (message.secret != secret) {
-            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
-            logger.error('Wrong secret: '+message.secret);
+        if (message.secret != server_secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message': 'Wrong secret'});
+            logger.error('Wrong secret: ' + message.secret);
         }
 
         logger.info(socket.id + ' > Init channel "' + message.endpoint + '" (' + message.privateKey + ')');
@@ -37,9 +38,9 @@ io.on('connection', function (socket) {
     socket.on('delete_channel', function (message) {
         ++nb;
 
-        if (message.secret != secret) {
-            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
-            logger.error('Wrong secret: '+message.secret);
+        if (message.secret != server_secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message': 'Wrong secret'});
+            logger.error('Wrong secret: ' + message.secret);
         }
 
         logger.info(socket.id + ' > Delete channel "' + message.endpoint + '" (' + message.privateKey + ')');
@@ -52,9 +53,9 @@ io.on('connection', function (socket) {
     socket.on('forward_notification', function (message) {
         ++nb;
 
-        if (message.secret != secret) {
-            socket.emit('answer_create_channel', {'status': 'error', 'message':'Wrong secret'});
-            logger.error('Wrong secret: '+message.secret);
+        if (message.secret != server_secret) {
+            socket.emit('answer_create_channel', {'status': 'error', 'message': 'Wrong secret'});
+            logger.error('Wrong secret: ' + message.secret);
         }
 
         logger.info(
@@ -81,11 +82,21 @@ io.on('connection', function (socket) {
                 foundWebHook = webHook;
             }
         }
-        var response = {'endpoint': foundWebHook};
-        socket.emit('answer_retrieve_configuration_from_private_key', response);
-        logger.info(
-            socket.id + ' > configuration sent for private key ' + message.privateKey + ': ' + JSON.stringify(response)
-        );
+        var response;
+        if (foundWebHook) {
+            response = {'status': 'ok', 'endpoint': foundWebHook};
+            socket.emit('answer_retrieve_configuration_from_private_key', response);
+            logger.info(
+                socket.id + ' > configuration sent for private key ' + message.privateKey + ': ' + JSON.stringify(response)
+            );
+        } else {
+            response = {'status': 'error', 'message': 'No webhook found for this private key'};
+            socket.emit('answer_retrieve_configuration_from_private_key', response);
+            logger.info(
+                socket.id + ' > configuration not found for private key ' + message.privateKey
+            );
+        }
+
     });
 
     socket.on('subscribe_channel', function (message) {

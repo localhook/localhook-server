@@ -86,7 +86,7 @@ class WorkflowTest extends KernelTestCase
                         $this->assertContains('REQUEST: POST ', $watchNotificationOutput);
                     }
 
-                    $socketIoServerProcess->signal(SIGKILL);
+                    $socketIoServerProcess->stop();
                 }
             }
         });
