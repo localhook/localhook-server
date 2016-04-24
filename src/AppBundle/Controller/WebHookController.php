@@ -44,23 +44,6 @@ class WebHookController extends Controller
     }
 
     /**
-     *
-     * @Route("/{id}", name="webhook_show")
-     * @Method("GET")
-     *
-     * @param WebHook $webHook
-     *
-     * @return Response
-     */
-    public function showAction(WebHook $webHook)
-    {
-        return $this->render('webhook/show.html.twig', [
-            'webHook'                 => $webHook,
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
-        ]);
-    }
-
-    /**
      * Creates a new WebHook entity.
      *
      * @Route("/new", name="webhook_new")
@@ -93,6 +76,23 @@ class WebHookController extends Controller
         return $this->render('webhook/new.html.twig', [
             'webHook'                 => $webHook,
             'form'                    => $form->createView(),
+            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
+        ]);
+    }
+
+    /**
+     *
+     * @Route("/{id}", name="webhook_show")
+     * @Method("GET")
+     *
+     * @param WebHook $webHook
+     *
+     * @return Response
+     */
+    public function showAction(WebHook $webHook)
+    {
+        return $this->render('webhook/show.html.twig', [
+            'webHook'                 => $webHook,
             'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
         ]);
     }
