@@ -1,36 +1,32 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>WebHook list</h1>
+    <h1><i class="glyphicon glyphicon-list"></i> List of your forwards</h1>
 
     <p>Server secret is: <code>{{ socket_io_client_secret }}</code></p>
-
-    <p>
-        <a class="btn btn-primary" href="{{ path('webhook_new') }}">Create a new webhook</a>
-    </p>
 
     <table class="table table-striped table-hover ">
         <thead>
         <tr>
-            <th>Endpoint</th>
+            <th>Incoming URL</th>
             <th>Private key</th>
             <th>Created at</th>
             <th>Updated at</th>
-            <th>Notifications</th>
+            <th class="text-center">Notifications</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         {% for webHook in webHooks %}
             <tr>
-                <td title="{{ webHook.id }}">{{ webHook.endpoint }}</td>
-                <td>{{ webHook.privateKey }}</td>
+                <td title="{{ webHook.id }}">{{ url('notifications', {'endpoint': webHook.endpoint}) }}</td>
+                <td><code>{{ webHook.privateKey }}</code></td>
                 <td>{{ webHook.createdAt|date('Y-m-d H:i:s') }}</td>
                 <td>{{ webHook.updatedAt|date('Y-m-d H:i:s') }}</td>
-                <td>{{ webHook.notifications|length }}</td>
+                <td class="text-center"><span class="label label-success">{{ webHook.notifications|length }}</span></td>
                 <td>
                     {{ form_start(delete_forms[webHook.id]) }}
-                    <input class="btn btn-default" type="submit" value="Delete">
+                    <button class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i></button>
                     {{ form_end(delete_forms[webHook.id]) }}
                 </td>
             </tr>
@@ -38,7 +34,8 @@
         </tbody>
     </table>
 
-    <p>
-        <a class="btn btn-primary" href="{{ path('webhook_new') }}">Create a new webhook</a>
+    <p class="text-center">
+        <a class="btn btn-primary" href="{{ path('webhook_new') }}"><i class="glyphicon glyphicon-plus"></i> Create a
+            new webhook</a>
     </p>
 {% endblock %}

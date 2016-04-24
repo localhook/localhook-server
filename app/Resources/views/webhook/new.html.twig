@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>WebHook creation</h1>
+    <h1><i class="glyphicon glyphicon-plus"></i> Create a new forward</h1>
 
     <p>Server secret is: <code>{{ socket_io_client_secret }}</code></p>
 
@@ -10,11 +10,12 @@
             <div class="well bs-component">
                 {{ form_start(form, {'attr':{'class':'form-horizontal'}}) }}
                     <fieldset>
-                        <legend>Create a webhook</legend>
+                        <legend>Choose a endpoint</legend>
                         <div class="form-group">
-                            <label for="inputEmail" class="col-lg-2 control-label">{{ form_label(form.endpoint) }}</label>
-                            <div class="col-lg-10">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon3">{{ app.request.getSchemeAndHttpHost() }}/</span>
                                 {{ form_widget(form.endpoint, {'attr':{'class':'form-control'}}) }}
+                                <span class="input-group-addon" id="basic-addon3">/notifications</span>
                             </div>
                         </div>
                         <div class="form-group">
