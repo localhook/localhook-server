@@ -1,4 +1,4 @@
 Localhook
 =========
 
-View the [online documentation](https://lucascherifi.github.io/localhook-server).
+View the [online documentation](https://localhook.github.io/localhook).
