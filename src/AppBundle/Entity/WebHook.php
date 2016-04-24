@@ -63,15 +63,6 @@ class WebHook
      */
     private $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @Gedmo\Timestampable(on="update")
-     * @ORM\Column(type="datetime")
-     *
-     */
-    private $updatedAt;
-
     public function __construct()
     {
         $this->notifications = new ArrayCollection();
@@ -85,22 +76,6 @@ class WebHook
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
     }
 
     /**
