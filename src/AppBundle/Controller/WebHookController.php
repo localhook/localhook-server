@@ -2,14 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\WebHook;
+use AppBundle\Form\WebHookType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use AppBundle\Entity\WebHook;
-use AppBundle\Form\WebHookType;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -37,9 +37,26 @@ class WebHookController extends Controller
         }
 
         return $this->render('webhook/index.html.twig', [
-            'webHooks'     => $webHooks,
-            'delete_forms' => $deleteForms,
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret')
+            'webHooks'                => $webHooks,
+            'delete_forms'            => $deleteForms,
+            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
+        ]);
+    }
+
+    /**
+     *
+     * @Route("/{id}", name="webhook_show")
+     * @Method("GET")
+     *
+     * @param WebHook $webHook
+     *
+     * @return Response
+     */
+    public function showAction(WebHook $webHook)
+    {
+        return $this->render('webhook/show.html.twig', [
+            'webHook'                 => $webHook,
+            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
         ]);
     }
 
@@ -74,9 +91,9 @@ class WebHookController extends Controller
         }
 
         return $this->render('webhook/new.html.twig', [
-            'webHook' => $webHook,
-            'form'    => $form->createView(),
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret')
+            'webHook'                 => $webHook,
+            'form'                    => $form->createView(),
+            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
         ]);
     }
 

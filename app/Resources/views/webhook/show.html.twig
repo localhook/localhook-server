@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1><i class="glyphicon glyphicon-screenshot"></i> {{ url('notifications', {endpoint: webHook.endpoint}) }}</h1>
+
+    <p>Webhook private key is: <code>{{ webHook.privateKey }}</code></p>
+    <p>Server secret is: <code>{{ socket_io_client_secret }}</code></p>
+
+    <h3>Received notifications</h3>
+
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>Method</th>
+            <th>Query parameters</th>
+            <th>Request parameters</th>
+            <th>Headers</th>
+            <th>Created at</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for notification in webHook.notifications %}
+            {% set content = notification.content | json_decode(true) %}
+            <tr>
+                <td><div class="label label-success">{{ content.method }}</div></td>
+                <td>
+                    <table class="table table-striped table-hover table-condensed">
+                        {% for key, item in content.query %}
+                        <tr><th class="text-right">{{ key }}</th><td>{{ item|join(';') }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table class="table table-striped table-hover table-condensed">
+                        {% for key, item in content.request %}
+                            <tr><th class="text-right">{{ key }}</th><td>{{ item|join(';') }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>
+                    <table class="table table-striped table-hover table-condensed">
+                        {% for key, item in content.headers %}
+                            <tr><th class="text-right">{{ key }}</th><td>{{ item|join(';') }}</td></tr>
+                        {% endfor %}
+                    </table>
+                </td>
+                <td>{{ notification.createdAt|date('Y-m-d H:i:s') }}</td>
+                <td>
+                    <button class="btn btn-default btn-xs"><i class="glyphicon glyphicon-refresh"></i> Replay</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="text-center">
+        <a class="btn btn-primary" href="{{ path('webhook_index') }}"><i class="glyphicon glyphicon-list"></i> Back to the list</a>
+    </p>
+{% endblock %}

@@ -15,3 +15,9 @@ services:
         class: Kasifi\Localhook\SocketIoClientConnector
         arguments:
           - "http://localhost:%socket_io_port%"
+
+    app.twig_extension:
+        class: AppBundle\Twig\AppExtension
+        public: false
+        tags:
+            - { name: twig.extension }

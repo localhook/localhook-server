@@ -19,11 +19,25 @@
         <tbody>
         {% for webHook in webHooks %}
             <tr>
-                <td title="{{ webHook.id }}">{{ url('notifications', {'endpoint': webHook.endpoint}) }}</td>
-                <td><code>{{ webHook.privateKey }}</code></td>
-                <td>{{ webHook.createdAt|date('Y-m-d H:i:s') }}</td>
-                <td>{{ webHook.updatedAt|date('Y-m-d H:i:s') }}</td>
-                <td class="text-center"><span class="label label-success">{{ webHook.notifications|length }}</span></td>
+                <td title="{{ webHook.id }}">
+                    <a href="{{ path('webhook_show', {id: webHook.id}) }}">
+                        {{ url('notifications', {'endpoint': webHook.endpoint}) }}
+                    </a>
+                </td>
+                <td>
+                    <code>{{ webHook.privateKey }}</code>
+                </td>
+                <td>
+                    {{ webHook.createdAt|date('Y-m-d H:i:s') }}
+                </td>
+                <td>
+                    {{ webHook.updatedAt|date('Y-m-d H:i:s') }}
+                </td>
+                <td class="text-center">
+                    <a href="{{ path('webhook_show', {id: webHook.id}) }}">
+                        <span class="label label-success">{{ webHook.notifications|length }}</span>
+                    </a>
+                </td>
                 <td>
                     {{ form_start(delete_forms[webHook.id]) }}
                     <button class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i></button>

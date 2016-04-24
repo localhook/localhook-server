@@ -4,7 +4,7 @@ AppBundle\Entity\WebHook:
         privateKey: <current()>----------------------------------
         username: admin
 AppBundle\Entity\Notification:
-    notification_{1..100}:
+    notification_{1..6}:
         webHook: "@web_hook_*"
         content: |
-          {"headers":{"host":{"localhost"}, "user-agent":{"GuzzleHttp/6.2.0 curl/7.43.0 PHP/7.0.2"}}}
+          {"method":"POST","headers":{"host":["localhost:8000"],"content-length":["0"],"user-agent":["GuzzleHttp\/6.2.0 curl\/7.43.0 PHP\/7.0.2"],"json":["post_value_1"],"x-php-ob-level":[1]},"query":{"get_param_1":"get_value_1","get_param_2":"get_value_2"},"request":{"post_param_1":"post_value_1","post_param_2":"post_value_2"}}
