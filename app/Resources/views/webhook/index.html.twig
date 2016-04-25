@@ -51,7 +51,10 @@
                 </td>
                 <td>
                     {{ form_start(delete_forms[webHook.id]) }}
-                    <button class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i></button>
+                    <button class="btn btn-default btn-xs" title="Delete {{ webHook.endpoint }}">
+                        <i class="glyphicon glyphicon-remove"></i>
+                        Delete {{ webHook.endpoint }}
+                    </button>
                     {{ form_end(delete_forms[webHook.id]) }}
                 </td>
             </tr>

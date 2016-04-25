@@ -12,6 +12,11 @@ class WorkflowTest extends KernelTestCase
     /** @var string */
     private $socketIoPort;
 
+    public static function dump($var)
+    {
+        fwrite(STDERR, print_r($var, true));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -25,13 +30,8 @@ class WorkflowTest extends KernelTestCase
             $tool = new SchemaTool($em);
             $tool->dropSchema($metaData);
             $tool->createSchema($metaData);
-            Fixtures::load(static::$kernel->getRootDir().'/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
+            Fixtures::load(static::$kernel->getRootDir() . '/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
         }
-    }
-
-    public static function dump($var)
-    {
-        fwrite(STDERR, print_r($var, true));
     }
 
     public function testFullProcess()
