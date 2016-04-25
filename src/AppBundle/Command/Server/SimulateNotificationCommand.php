@@ -55,7 +55,9 @@ class SimulateNotificationCommand extends ContainerAwareCommand
 
     private function httpExecution($endpoint)
     {
-        $url = 'http://localhost:8000/' . $endpoint . '/notifications?' . http_build_query([
+        $socketIoPort = $this->getContainer()->getParameter('socket_io_port');
+
+        $url = 'http://localhost:' . $socketIoPort . '/' . $endpoint . '/notifications?' . http_build_query([
                 'post_param_1' => 'post_value_1',
                 'post_param_2' => 'post_value_2',
             ]);
