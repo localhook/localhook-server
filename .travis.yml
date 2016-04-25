@@ -27,5 +27,8 @@ install:
   - travis_retry composer install --no-interaction
   - composer info -i
 
+script:
+  - phpunit -c app/
+
 notifications:
   email: true
