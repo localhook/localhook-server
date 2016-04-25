@@ -29,7 +29,7 @@ install:
 
 script:
   - cd src/AppBundle/Resources/SocketIo && npm install
-  - bin/phpunit -c app/
+  - phpunit -c app/
 
 notifications:
   email: true
