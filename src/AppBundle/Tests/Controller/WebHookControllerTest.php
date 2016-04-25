@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 class WebHookControllerTest extends WebTestCase
 {
     /** @var string */
-    private $socketIoPort;
+    private $socketPort;
 
     public static function dump($var)
     {
@@ -36,18 +36,18 @@ class WebHookControllerTest extends WebTestCase
 
     public function testCompleteScenario()
     {
-        $this->socketIoPort = static::$kernel->getContainer()->getParameter('socket_io_port');
+        $this->socketPort = static::$kernel->getContainer()->getParameter('socket_port');
 
-        $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
-        $socketIoServerProcess->setTimeout(null)->start();
+        $socketServerProcess = new Process('php app/console app:run-socket');
+        $socketServerProcess->setTimeout(null)->start();
         $kernel = static::$kernel;
-        $socketIoServerProcess->wait(function ($type, $buffer) use ($kernel, $socketIoServerProcess) {
+        $socketServerProcess->wait(function ($type, $buffer) use ($kernel, $socketServerProcess) {
             if (Process::ERR === $type) {
-                self::dump('SOCKET IO ERR > ' . $buffer);
+                self::dump('SOCKET ERR > ' . $buffer);
             } else {
                 //self::dump($buffer);
 
-                if (strpos($buffer, 'Channels successfully created')) {
+                if (strpos($buffer, 'Run socket server on port')) {
 
                     // Create a new client to browse the application
                     $client = static::createClient([], [
@@ -74,12 +74,12 @@ class WebHookControllerTest extends WebTestCase
                                                         ->count(), 'Missing element a:contains("webhook_test")');
                     // Delete the entity
                     $client->submit($crawler->selectButton('Delete webhook_test')->form());
-                    $crawler = $client->followRedirect();
+                    $client->followRedirect();
 
                     // Check the entity has been delete on the list
                     $this->assertNotRegExp('/webhook_test/', $client->getResponse()->getContent());
 
-                    $socketIoServerProcess->stop();
+                    $socketServerProcess->stop();
                 }
             }
         });

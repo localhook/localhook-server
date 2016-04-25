@@ -55,6 +55,13 @@ class WebHook
     private $notifications;
 
     /**
+     * @var Client[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="Client", mappedBy="webHook", cascade={"remove"}))
+     *
+     */
+    private $clients;
+
+    /**
      * @var \DateTime
      *
      * @Gedmo\Timestampable(on="create")
@@ -66,6 +73,7 @@ class WebHook
     public function __construct()
     {
         $this->notifications = new ArrayCollection();
+        $this->clients = new ArrayCollection();
     }
 
     /**
@@ -153,9 +161,35 @@ class WebHook
     /**
      * @param Notification $notification
      */
-    public function addNotification($notification)
+    public function addNotification(Notification $notification)
     {
         $this->notifications->add($notification);
         $notification->setWebHook($this);
+    }
+
+    /**
+     * @return Client[]|ArrayCollection
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+
+    /**
+     * @param Client $client
+     */
+    public function addClient(Client $client)
+    {
+        $this->clients->add($client);
+        $client->setWebHook($this);
+    }
+
+    /**
+     * @param Client $client
+     */
+    public function removeClient(Client $client)
+    {
+        $this->clients->remove($client);
+        $client->setWebHook(null);
     }
 }

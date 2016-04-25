@@ -29,8 +29,7 @@ install:
 
 script:
   - php app/console server:start
-  - cd src/AppBundle/Resources/SocketIo && npm install
-  - cd ../../../.. && phpunit -c app/
+  - phpunit -c app/
   - php app/console server:stop
 
 notifications:
