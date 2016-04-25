@@ -1,9 +1,12 @@
 sudo: false
+
 language: php
+
 cache:
   directories:
   - $HOME/.composer/cache
   - vendor
+
 matrix:
   fast_finish: true
   include:
@@ -15,11 +18,14 @@ matrix:
   - php: hhvm
   allow_failures:
   - php: hhvm
+
 before_install:
   - phpenv config-rm xdebug.ini
   - composer self-update
+
 install:
   - travis_retry composer install --no-interaction
   - composer info -i
+
 notifications:
   email: true
