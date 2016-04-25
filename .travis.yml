@@ -28,6 +28,7 @@ install:
   - composer info -i
 
 script:
+  - cd src/AppBundle/Resources/SocketIo && npm install
   - bin/phpunit -c app/
 
 notifications:
