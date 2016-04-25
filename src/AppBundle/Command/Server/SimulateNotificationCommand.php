@@ -58,9 +58,10 @@ class SimulateNotificationCommand extends ContainerAwareCommand
         $socketIoPort = $this->getContainer()->getParameter('socket_io_port');
 
         $url = 'http://localhost:' . $socketIoPort . '/' . $endpoint . '/notifications?' . http_build_query([
-                'post_param_1' => 'post_value_1',
-                'post_param_2' => 'post_value_2',
+                'get_param_1' => 'get_value_1',
+                'get_param_2' => 'get_value_2',
             ]);
+        $this->io->comment('URL: '.$url);
         $client = new Client();
         $request = new GuzzleRequest('POST', $url, [
             'json' => [
