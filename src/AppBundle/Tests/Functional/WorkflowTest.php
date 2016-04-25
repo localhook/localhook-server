@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 class WorkflowTest extends KernelTestCase
 {
     /** @var string */
-    private $socketIoPort;
+    private $socketPort;
 
     public static function dump($var)
     {
@@ -37,41 +37,32 @@ class WorkflowTest extends KernelTestCase
     public function testFullProcess()
     {
 
-        $this->socketIoPort = static::$kernel->getContainer()->getParameter('socket_io_port');
+        $this->socketPort = static::$kernel->getContainer()->getParameter('socket_port');
 
-        $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
-        $socketIoServerProcess->setTimeout(null)->start();
+        $socketServerProcess = new Process('php app/console app:run-socket');
+        $socketServerProcess->setTimeout(null)->start();
         $kernel = static::$kernel;
-        $socketIoServerProcess->wait(function ($type, $buffer) use ($kernel, $socketIoServerProcess) {
+        $socketServerProcess->wait(function ($type, $buffer) use ($kernel, $socketServerProcess) {
             if (Process::ERR === $type) {
                 self::dump('SOCKET IO ERR > ' . $buffer);
             } else {
                 //self::dump($buffer);
 
-                if (strpos($buffer, 'Channels successfully created')) {
-                    $this->assertContains('Channels successfully created', $buffer);
-
-                    $socketIoClientConnector = $kernel->getContainer()->get('socket_io_client_connector')->ensureConnection();
-
-                    // Retrieve configuration
-
-                    $configuration = $socketIoClientConnector->retrieveConfigurationFromPrivateKey(
-                        '1----------------------------------'
-                    );
-
-                    $this->assertEquals($configuration['endpoint'], 'webhook_1');
+                if (strpos($buffer, 'Run socket server on port')) {
+                    $this->assertContains('Run socket server on port', $buffer);
 
                     // Start notification watcher
 
                     $watchNotificationProcess = new Process(
-                        'php app/console app:client:watch-notifications ' . $configuration['endpoint'] . '  --max=1'
+                        'bin/localhook run webhook_1 1----------------------------------' .
+                        ' http://localhost/my-project ws://127.0.0.1:1337 --no-config-file --max=1'
                     );
                     $watchNotificationProcess->setTimeout(null)->start();
 
                     // Simulate a notification
 
                     $simulateNotificationProcess = new Process(
-                        'php app/console app:server:simulate-notification webhook_1'
+                        'php app/console app:simulate-notification webhook_1'
                     );
                     $simulateNotificationProcess->setTimeout(null)->run();
                     $simulationOutput = $simulateNotificationProcess->getOutput();
@@ -81,12 +72,15 @@ class WorkflowTest extends KernelTestCase
                     while ($watchNotificationProcess->isRunning()) {
                         // waiting for process to finish
                     }
-                    $watchNotificationOutput = $watchNotificationProcess->getIncrementalOutput();
-                    if (strlen($watchNotificationOutput)) {
-                        $this->assertContains('REQUEST: POST ', $watchNotificationOutput);
-                    }
+                    $watchNotificationErrorOutput = $watchNotificationProcess->getIncrementalErrorOutput();
+                    $this->assertEquals(0, strlen($watchNotificationErrorOutput), $watchNotificationErrorOutput);
+                    $this->assertEquals(0, $watchNotificationProcess->getExitCode());
 
-                    $socketIoServerProcess->stop();
+
+                    $watchNotificationOutput = $watchNotificationProcess->getIncrementalOutput();
+                    $this->assertContains('?get_param_1=get_value_1&get_param_2=get_value_2', $watchNotificationOutput);
+
+                    $socketServerProcess->stop();
                 }
             }
         });
