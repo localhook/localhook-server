@@ -28,7 +28,7 @@ install:
   - composer info -i
 
 script:
-  - phpunit -c app/
+  - bin/phpunit -c app/
 
 notifications:
   email: true
