@@ -28,8 +28,8 @@ install:
   - composer info -i
 
 script:
-  - cd src/AppBundle/Resources/SocketIo && npm install && cd -
-  - bin/phpunit -c app/
+  - cd src/AppBundle/Resources/SocketIo && npm install
+  - cd ../../../.. && phpunit -c app/
 
 notifications:
   email: true
