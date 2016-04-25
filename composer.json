@@ -23,7 +23,7 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "stof/doctrine-extensions-bundle": "^1.2",
         "guzzlehttp/guzzle": "^6.2",
-        "lucascherifi/localhook-client": "dev-master"
+        "localhook/localhook": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
