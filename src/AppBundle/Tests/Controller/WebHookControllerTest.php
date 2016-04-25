@@ -5,9 +5,13 @@ namespace AppBundle\Tests\Controller;
 use Doctrine\ORM\Tools\SchemaTool;
 use Nelmio\Alice\Fixtures;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Process\Process;
 
 class WebHookControllerTest extends WebTestCase
 {
+    /** @var string */
+    private $socketIoPort;
+
     public static function dump($var)
     {
         fwrite(STDERR, print_r($var, true));
@@ -32,34 +36,52 @@ class WebHookControllerTest extends WebTestCase
 
     public function testCompleteScenario()
     {
-        // Create a new client to browse the application
-        $client = static::createClient([], [
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'admin',
-        ]);
+        $this->socketIoPort = static::$kernel->getContainer()->getParameter('socket_io_port');
 
-        // Create a new entry in the database
-        $crawler = $client->request('GET', '/webhook/');
-        $this->assertEquals(200, $client->getResponse()
-                                        ->getStatusCode(), "Unexpected HTTP status code for GET /webhook/");
-        $crawler = $client->click($crawler->selectLink('Create a new webhook')->link());
+        $socketIoServerProcess = new Process('php app/console app:server:run-socket-io');
+        $socketIoServerProcess->setTimeout(null)->start();
+        $kernel = static::$kernel;
+        $socketIoServerProcess->wait(function ($type, $buffer) use ($kernel, $socketIoServerProcess) {
+            if (Process::ERR === $type) {
+                self::dump('SOCKET IO ERR > ' . $buffer);
+            } else {
+                //self::dump($buffer);
 
-        // Fill in the form and submit it
-        $form = $crawler->selectButton('Submit')->form([
-            'web_hook[endpoint]' => 'webhook_test',
-        ]);
+                if (strpos($buffer, 'Channels successfully created')) {
 
-        $client->submit($form);
-        $crawler = $client->followRedirect();
+                    // Create a new client to browse the application
+                    $client = static::createClient([], [
+                        'PHP_AUTH_USER' => 'admin',
+                        'PHP_AUTH_PW'   => 'admin',
+                    ]);
 
-        // Check data in the show view
-        $this->assertGreaterThan(0, $crawler->filter('a:contains("webhook_test")')
-                                            ->count(), 'Missing element a:contains("webhook_test")');
-        // Delete the entity
-        $client->submit($crawler->selectButton('Delete webhook_test')->form());
-        $crawler = $client->followRedirect();
+                    // Create a new entry in the database
+                    $crawler = $client->request('GET', '/webhook/');
+                    $this->assertEquals(200, $client->getResponse()
+                                                    ->getStatusCode(), "Unexpected HTTP status code for GET /webhook/");
+                    $crawler = $client->click($crawler->selectLink('Create a new webhook')->link());
 
-        // Check the entity has been delete on the list
-        $this->assertNotRegExp('/webhook_test/', $client->getResponse()->getContent());
+                    // Fill in the form and submit it
+                    $form = $crawler->selectButton('Submit')->form([
+                        'web_hook[endpoint]' => 'webhook_test',
+                    ]);
+
+                    $client->submit($form);
+                    $crawler = $client->followRedirect();
+
+                    // Check data in the show view
+                    $this->assertGreaterThan(0, $crawler->filter('a:contains("webhook_test")')
+                                                        ->count(), 'Missing element a:contains("webhook_test")');
+                    // Delete the entity
+                    $client->submit($crawler->selectButton('Delete webhook_test')->form());
+                    $crawler = $client->followRedirect();
+
+                    // Check the entity has been delete on the list
+                    $this->assertNotRegExp('/webhook_test/', $client->getResponse()->getContent());
+
+                    $socketIoServerProcess->stop();
+                }
+            }
+        });
     }
 }
