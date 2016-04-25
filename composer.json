@@ -1,5 +1,5 @@
 {
-    "name": "lcherifi/localhook-server",
+    "name": "localhook/localhook-server",
     "license": "MIT",
     "type": "project",
     "autoload": {
