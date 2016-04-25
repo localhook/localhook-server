@@ -15,6 +15,9 @@
 /bin/
 /composer.phar
 
+# Couscous
+.couscous
+
 # Sqlite DB
 /app/data.db3
 
