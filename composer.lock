@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a2d709fb347decb027bd0b239207499a",
-    "content-hash": "4e5d3ecb44afb47570c2a15bdbe707cb",
+    "hash": "2dc32dd7e038fb873457f72d8ff9b91e",
+    "content-hash": "f931b80bf0c0d420fd7e803af174cf5e",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1207,22 +1207,22 @@
             "time": "2014-01-12 16:20:24"
         },
         {
-            "name": "lucascherifi/localhook-client",
+            "name": "localhook/localhook",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/lucascherifi/localhook-client.git",
-                "reference": "76c35a171b39a7d110a62e8dbec01580bbdf7918"
+                "url": "https://github.com/localhook/localhook.git",
+                "reference": "7db22bafc39bde5a40964e605de98c82d45ee3c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lucascherifi/localhook-client/zipball/76c35a171b39a7d110a62e8dbec01580bbdf7918",
-                "reference": "76c35a171b39a7d110a62e8dbec01580bbdf7918",
+                "url": "https://api.github.com/repos/localhook/localhook/zipball/7db22bafc39bde5a40964e605de98c82d45ee3c9",
+                "reference": "7db22bafc39bde5a40964e605de98c82d45ee3c9",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
-                "padraic/phar-updater": "@stable",
+                "padraic/phar-updater": "^1.0",
                 "symfony/console": "@stable",
                 "symfony/filesystem": "@stable",
                 "symfony/finder": "@stable",
@@ -1250,7 +1250,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-04-23 11:54:03"
+            "time": "2016-04-25 16:57:31"
         },
         {
             "name": "monolog/monolog",
@@ -3095,7 +3095,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "lucascherifi/localhook-client": 20
+        "localhook/localhook": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
