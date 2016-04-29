@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Notification;
-use AppBundle\Entity\WebHook;
+use AppBundle\Ratchet\AdminClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class NotificationController extends Controller
 {
+    /** @var AdminClient */
+    private $socketAdminClient;
+
     /**
      * @Route("{endpoint}/notifications", name="notifications")
      * @param Request $request
@@ -26,17 +29,23 @@ class NotificationController extends Controller
         $notification = new Notification();
         $notification->setWebHook($webHook);
         $requestData = [
-            'method'          => $request->getMethod(),
-            'headers'         => $request->headers->all(),
-            'query'           => $request->query->all(),
-            'request'         => $request->request->all(),
+            'method'  => $request->getMethod(),
+            'headers' => $request->headers->all(),
+            'query'   => $request->query->all(),
+            'request' => $request->request->all(),
             //'files'           => $request->files->all(),
         ];
         $notification->setContent(json_encode($requestData));
         $em->persist($notification);
         $em->flush();
 
-        $this->get('socket_io_connector')->ensureConnection()->forwardNotification($webHook, $requestData);
+        $this->socketAdminClient = $this->get('socket_admin_client');
+        $this->socketAdminClient->start(function () use ($webHook, $requestData) {
+            $this->socketAdminClient->executeSendRequest(
+                $webHook->getPrivateKey(), $requestData, function () {
+                $this->socketAdminClient->stop();
+            });
+        });
 
         return new JsonResponse();
     }

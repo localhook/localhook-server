@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\WebHook;
 use AppBundle\Form\WebHookType;
+use AppBundle\Ratchet\AdminClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -19,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WebHookController extends Controller
 {
+    /** @var AdminClient */
+    private $socketAdminClient;
+
     /**
      * Lists all WebHook entities.
      *
@@ -39,7 +43,7 @@ class WebHookController extends Controller
         return $this->render('webhook/index.html.twig', [
             'webHooks'                => $webHooks,
             'delete_forms'            => $deleteForms,
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
+            'socket_client_secret' => $this->getParameter('socket_client_secret'),
         ]);
     }
 
@@ -67,8 +71,13 @@ class WebHookController extends Controller
             $em->persist($webHook);
             $em->flush();
 
-            // Create channel in Socket IO
-            $this->get('socket_io_connector')->ensureConnection()->createChannel($webHook)->closeConnection();
+            // Create channel in Socket
+            $this->socketAdminClient = $this->get('socket_admin_client');
+            $this->socketAdminClient->start(function () use ($webHook) {
+                $this->socketAdminClient->executeAddWebHook($webHook->getPrivateKey(), function () {
+                    $this->socketAdminClient->stop();
+                });
+            });
 
             return $this->redirectToRoute('webhook_index', ['id' => $webHook->getId()]);
         }
@@ -76,7 +85,7 @@ class WebHookController extends Controller
         return $this->render('webhook/new.html.twig', [
             'webHook'                 => $webHook,
             'form'                    => $form->createView(),
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
+            'socket_client_secret' => $this->getParameter('socket_client_secret'),
         ]);
     }
 
@@ -93,7 +102,7 @@ class WebHookController extends Controller
     {
         return $this->render('webhook/show.html.twig', [
             'webHook'                 => $webHook,
-            'socket_io_client_secret' => $this->getParameter('socket_io_client_secret'),
+            'socket_client_secret' => $this->getParameter('socket_client_secret'),
         ]);
     }
 
@@ -115,8 +124,16 @@ class WebHookController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            // Delete channel in Socket IO
-            $this->get('socket_io_connector')->ensureConnection()->deleteChannel($webHook)->closeConnection();
+
+            // Delete channel in Socket
+            $this->socketAdminClient = $this->get('socket_admin_client');
+            $this->socketAdminClient->start(function () use ($webHook, $em) {
+                $this->socketAdminClient->executeRemoveWebHook(
+                    $webHook->getPrivateKey(),
+                    function () use ($webHook, $em) {
+                        $this->socketAdminClient->stop();
+                    });
+            });
             $em->remove($webHook);
             $em->flush();
         }

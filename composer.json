@@ -11,6 +11,12 @@
             "app/AppCache.php"
         ]
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/localhook/localhook"
+        }
+    ],
     "require": {
         "php": ">=5.3.9",
         "symfony/symfony": "2.8.*",
@@ -23,7 +29,8 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "stof/doctrine-extensions-bundle": "^1.2",
         "guzzlehttp/guzzle": "^6.2",
-        "localhook/localhook": "dev-master"
+        "cboden/ratchet": "^0.3.4",
+        "localhook/localhook": "dev-ratchet"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -53,7 +60,6 @@
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability": "stable",
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web",
