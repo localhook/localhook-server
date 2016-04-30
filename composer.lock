@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "43664ee4c5bcb8a6155e39e33c30b4ce",
-    "content-hash": "213ef601102d555cdceaed2eda7dede2",
+    "hash": "fdac68bc7dabd6fc02fb3e4713bc7d2c",
+    "content-hash": "bdd57d414c5bc13d55cbf207d310624f",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1504,11 +1504,11 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "dev-ratchet",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook",
-                "reference": "77c61162242045253ab85b76fa688baceddb902d"
+                "reference": "2129bf17d362b6514795a4b4c1f9ecd0dc078bea"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1539,7 +1539,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-04-29 12:31:18"
+            "time": "2016-04-29 13:20:05"
         },
         {
             "name": "monolog/monolog",
@@ -4549,9 +4549,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "localhook/localhook": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
