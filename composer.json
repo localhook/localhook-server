@@ -30,7 +30,7 @@
         "stof/doctrine-extensions-bundle": "^1.2",
         "guzzlehttp/guzzle": "^6.2",
         "cboden/ratchet": "^0.3.4",
-        "localhook/localhook": "dev-ratchet"
+        "localhook/localhook": "^1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
