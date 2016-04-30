@@ -1504,11 +1504,11 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook",
-                "reference": "2129bf17d362b6514795a4b4c1f9ecd0dc078bea"
+                "reference": "b8d7558be186b1d1dd0c0575d0daa6e71a8dd4b3"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1539,7 +1539,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-04-29 13:20:05"
+            "time": "2016-04-30 02:59:13"
         },
         {
             "name": "monolog/monolog",
