@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "564af4bf2abe461c95a9712db4e79649",
-    "content-hash": "9df82bef7682e949d8209d5395126b92",
+    "hash": "79ceb7dff4cebdc268af0ae3b28a2550",
+    "content-hash": "a970ea455952f49fdd4b0daa18cace06",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1573,11 +1573,11 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "1.0.1",
+            "version": "dev-new_auth",
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook",
-                "reference": "b8d7558be186b1d1dd0c0575d0daa6e71a8dd4b3"
+                "reference": "91cdccb893793d1ea130ab8a0e52ea6890cfc8d5"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1608,7 +1608,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-04-30 02:59:13"
+            "time": "2016-05-02 21:51:57"
         },
         {
             "name": "monolog/monolog",
@@ -4623,6 +4623,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "localhook/localhook": 20,
         "friendsofsymfony/user-bundle": 20
     },
     "prefer-stable": false,
