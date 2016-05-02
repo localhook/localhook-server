@@ -43,7 +43,7 @@ class NotificationController extends Controller
         $this->socketAdminClient = $this->get('socket_admin_client');
         $this->socketAdminClient->start(function () use ($webHook, $requestData) {
             $this->socketAdminClient->executeSendRequest(
-                $webHook->getPrivateKey(), $requestData, function () {
+                $webHook, $requestData, function () {
                 $this->socketAdminClient->stop();
             });
         });

@@ -7,16 +7,21 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class DefaultController extends Controller
+class HomeController extends Controller
 {
     /**
      *
      * @Route("/", name="index")
      * @Method("GET")
+     *
      * @return RedirectResponse
      */
     public function indexAction()
     {
-        return $this->redirectToRoute('webhook_index');
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('webhook_index');
+        } else {
+            return $this->render('Home/index.html.twig');
+        }
     }
 }

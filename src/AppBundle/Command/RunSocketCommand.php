@@ -20,9 +20,6 @@ class RunSocketCommand extends ContainerAwareCommand
     /** @var string */
     private $socketPort;
 
-    /** @var string */
-    private $serverSecret;
-
     protected function configure()
     {
         $this
@@ -34,12 +31,13 @@ class RunSocketCommand extends ContainerAwareCommand
     {
         $this->io = new SymfonyStyle($input, $output);
         $this->socketPort = $this->getContainer()->getParameter('socket_port');
-        $this->serverSecret = $this->getContainer()->getParameter('socket_server_secret');
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        $socketUrl = $this->getContainer()->getParameter('socket_url');
+        $webUrl = $this->getContainer()->getParameter('web_server_url');
         $webHooks = $em->getRepository('AppBundle:WebHook')->findAll();
         $this->io->comment(count($webHooks) . ' webHook(s)');
-        $server = new Server($em, $webHooks, $this->serverSecret);
+        $server = new Server($em, $webHooks, $webUrl, $socketUrl);
         $server->setIo($this->io);
 
         $this->killExistingSocketServer();

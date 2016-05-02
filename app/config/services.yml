@@ -14,15 +14,13 @@ services:
         class: AppBundle\Ratchet\AdminClient
         arguments:
           - "%socket_url%"
-          - "%socket_server_secret%"
 
     socket_user_client:
         class: Localhook\Localhook\Ratchet\UserClient
         arguments:
           - "%socket_url%"
 
-#    socket_user_run_command:
-#        class: Localhook\Localhook\Command\RunCommand
-#        arguments: ["app:client:run"]
-#        tags:
-#          -  { name: console.command }
+    app.registration_initialize_listener:
+        class: AppBundle\UserBundle\EventListener\RegistrationInitializeListener
+        tags:
+            - { name: kernel.event_subscriber }

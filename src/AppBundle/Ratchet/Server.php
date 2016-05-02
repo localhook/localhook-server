@@ -2,6 +2,7 @@
 namespace AppBundle\Ratchet;
 
 use AppBundle\Entity\Client;
+use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -17,7 +18,7 @@ class Server implements MessageComponentInterface
     private $io;
 
     /** @var SplObjectStorage */
-    protected $clients;
+    protected $socketClients;
 
     /** @var Client[] */
     protected $clientEntities = [];
@@ -28,18 +29,20 @@ class Server implements MessageComponentInterface
     /** @var EntityManager */
     private $em;
 
-    /**
-     * @var
-     */
-    private $serverSecret;
+    /** @var string */
+    private $socketUrl;
 
-    public function __construct(EntityManager $em, $webHooks, $serverSecret)
+    /** @var string */
+    private $webUrl;
+
+    public function __construct(EntityManager $em, $webHooks, $webUrl, $socketUrl)
     {
         $this->em = $em;
         $this->webHooks = new ArrayCollection($webHooks);
-        $this->clients = new SplObjectStorage;
-        $this->serverSecret = $serverSecret;
+        $this->socketClients = new SplObjectStorage;
         $this->purgeClients();
+        $this->socketUrl = $socketUrl;
+        $this->webUrl = $webUrl;
     }
 
     public function setIo(SymfonyStyle $io)
@@ -50,7 +53,7 @@ class Server implements MessageComponentInterface
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages to later
-        $this->clients->attach($conn);
+        $this->socketClients->attach($conn);
         $clientEntity = new Client();
         $this->em->persist($clientEntity);
         $this->em->flush();
@@ -64,7 +67,7 @@ class Server implements MessageComponentInterface
         $this->em->remove($clientEntity);
         $this->em->flush();
         // The connection is closed, remove it, as we can no longer send it messages
-        $this->clients->detach($conn);
+        $this->socketClients->detach($conn);
         $this->io->comment("[{$conn->resourceId}] Disconnection");
     }
 
@@ -76,38 +79,38 @@ class Server implements MessageComponentInterface
             unset($msg['type']);
             $comKey = $msg['comKey'];
             unset($msg['comKey']);
-            switch ($type) {
-                // Server
-                case 'addWebHook':
-                    if ($this->checkServerSecret($from, $type, $comKey, $msg)) {
-                        $this->receiveAddWebHook($from, $msg, $type, $comKey);
-                    }
+            if ($type == 'retrieveConfigurationFromSecret') {
+                $this->retrieveConfigurationFromSecret($from, $msg, $type, $comKey);
+            } else {
+                $secret = $msg['secret'];
+                unset($msg['secret']);
+                $user = $this->em->getRepository('AppBundle:User')->findOneBy(['secret' => $secret]);
+                if ($user) {
+                    switch ($type) {
+                        // Server
+                        case 'addWebHook':
+                            $this->receiveAddWebHook($user, $from, $msg, $type, $comKey);
+                            break;
+                        case 'removeWebHook':
+                            $this->receiveRemoveWebHook($user, $from, $msg, $type, $comKey);
+                            break;
+                        case 'sendRequest':
+                            $this->receiveSendRequest($user, $from, $msg, $type, $comKey);
+                            break;
 
-                    break;
-                case 'removeWebHook':
-                    if ($this->checkServerSecret($from, $type, $comKey, $msg)) {
-                        $this->receiveRemoveWebHook($from, $msg, $type, $comKey);
+                        // Client
+                        case 'subscribeWebHook':
+                            $this->subscribeWebHook($user, $from, $msg, $type, $comKey);
+                            break;
+                        case 'unsubscribeWebHook':
+                            $this->unsubscribeWebHook($user, $from, $msg, $type, $comKey);
+                            break;
+                        default:
+                            $this->answerError($from, $type, $comKey, 'Type "' . $type . '" not managed.');
                     }
-                    break;
-                case 'sendRequest':
-                    if ($this->checkServerSecret($from, $type, $comKey, $msg)) {
-                        $this->receiveSendRequest($from, $msg, $type, $comKey);
-                    }
-                    break;
-
-                // Client
-                case 'retrieveConfigurationFromSecret':
-                    $this->retrieveConfigurationFromSecret($from, $msg, $type, $comKey);
-                    break;
-                case 'subscribeWebHook':
-                    $this->subscribeWebHook($from, $msg, $type, $comKey);
-                    break;
-                case 'unsubscribeWebHook':
-                    $this->unsubscribeWebHook($from, $msg, $type, $comKey);
-                    break;
-
-                default:
-                    $this->io->error('Type "' . $type . '" not managed.');
+                } else {
+                    $this->answerError($from, $type, $comKey, 'Invalid secret');
+                }
             }
         } else {
             $this->io->error('Missing "type" in message');
@@ -139,142 +142,6 @@ class Server implements MessageComponentInterface
         $from->send($msg);
     }
 
-    private function checkServerSecret(ConnectionInterface $from, $type, $comKey, array $msg)
-    {
-        if ($this->serverSecret != $msg['serverSecret']) {
-            $this->answerError($from, $type, $comKey, 'Wrong server secret');
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private function receiveAddWebHook($from, $msg, $type, $comKey)
-    {
-        if (isset($msg['webHookSecret'])) {
-            $webHookSecret = $msg['webHookSecret'];
-            $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $webHookSecret]);
-            if ($webHook) {
-                $this->webHooks->add($webHook);
-                $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} added");
-                $this->answerOk($from, $type, $comKey);
-            } else {
-                $this->answerError($from, $type, $comKey, '[ADD] No webHook found for this webHookSecret');
-            }
-        } else {
-            $this->answerError($from, $type, $comKey, 'No webHookSecret provided');
-        }
-    }
-
-    private function receiveRemoveWebHook($from, $msg, $type, $comKey)
-    {
-        if (isset($msg['webHookSecret'])) {
-            $webHookSecret = $msg['webHookSecret'];
-            $matchingWebHook = null;
-            foreach ($this->webHooks as $webHook) {
-                if ($webHook->getPrivateKey() == $webHookSecret) {
-                    $matchingWebHook = $webHook;
-                }
-            }
-            //$webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $webHookSecret]);
-            if ($matchingWebHook) {
-                /** @var WebHook $webHook */
-                $webHook = $matchingWebHook;
-                $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} removed");
-                $this->webHooks->removeElement($webHook);
-                $this->answerOk($from, $type, $comKey);
-            } else {
-                $this->answerError($from, $type, $comKey, '[REMOVE] No webHook found for this webHookSecret');
-            }
-        } else {
-            $this->answerError($from, $type, $comKey, 'No webHookSecret provided');
-        }
-    }
-
-    private function receiveSendRequest(ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if (isset($msg['webHookSecret'])) {
-            $webHookSecret = $msg['webHookSecret'];
-            $request = $msg['request'];
-            $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $webHookSecret]);
-            if ($webHook) {
-                $clientEntities = $webHook->getClients();
-                foreach ($clientEntities as $clientEntity) {
-                    $clientId = array_search($clientEntity, $this->clientEntities);
-                    $client = null;
-                    foreach ($this->clients as $clientItem) {
-                        if ($clientItem->resourceId == $clientId) {
-                            $client = $clientItem;
-                            break;
-                        }
-                    }
-                    $this->io->comment("[{$from->resourceId}] Request sent to {$client->resourceId}");
-                    $this->answer($client, 'forwardRequest', $comKey, ['request' => $request]);
-                }
-                $this->answerOk($from, $type, $comKey);
-            } else {
-                $this->answerError($from, $type, $comKey, 'No webHookSecret found');
-            }
-        } else {
-            $this->answerError($from, $type, $comKey, 'No webHookSecret provided');
-        }
-    }
-
-    private function retrieveConfigurationFromSecret(ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if (isset($msg['secret'])) {
-            $secret = $msg['secret'];
-            $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $secret]);
-            if ($webHook) {
-                $this->io->comment("[{$from->resourceId}] Configuration retrieved for WebHook {$webHook->getEndpoint()}");
-                $this->answer($from, $type, $comKey, ['endpoint' => $webHook->getEndpoint()]);
-            } else {
-                $this->answerError($from, $type, $comKey, 'No webHook found for this secret');
-            }
-        } else {
-            $this->answerError($from, $type, $comKey, 'No secret provided when retrieving configuration from secret');
-        }
-    }
-
-    private function subscribeWebHook(ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if (isset($msg['secret'])) {
-            $secret = $msg['secret'];
-            $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $secret]);
-            if ($webHook) {
-                $clientEntity = $this->clientEntities[$from->resourceId];
-                $webHook->addClient($clientEntity);
-                $this->em->flush();
-                $this->io->comment("[{$from->resourceId}] Subscription to {$webHook->getEndpoint()}");
-                $this->answer($from, $type, $comKey, ['endpoint' => $webHook->getEndpoint()]);
-            } else {
-                $this->answerError($from, $type, $comKey, 'No webHook found for this secret');
-            }
-        } else {
-            $this->answerError($from, $type, $comKey, 'No secret provided when subscribing to the WebHook');
-        }
-    }
-
-    private function unsubscribeWebHook(ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if (isset($msg['secret'])) {
-            $secret = $msg['secret'];
-            $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['privateKey' => $secret]);
-            if ($webHook) {
-                $clientEntity = $this->clientEntities[$from->resourceId];
-                $webHook->removeClient($clientEntity);
-                $this->em->flush();
-                $this->io->comment("[{$from->resourceId}] Unsubscription to {$webHook->getEndpoint()}");
-                //$this->answerOk($from, $type);
-            } else {
-                //$this->answerError($from, $type, 'No webHook found for this secret');
-            }
-        } else {
-            //$this->answerError($from, $type, 'No webHookId provided');
-        }
-    }
-
     private function purgeClients()
     {
         $clientEntities = $this->em->getRepository('AppBundle:Client')->findAll();
@@ -283,6 +150,172 @@ class Server implements MessageComponentInterface
                 $this->em->remove($clientEntity);
             }
             $this->em->flush();
+        }
+    }
+
+    /**
+     * @param User                $user
+     * @param ConnectionInterface $from
+     * @param string              $type
+     * @param                     $comKey
+     * @param string              $endpoint
+     *
+     * @return WebHook
+     */
+    private function getWebHook(User $user, ConnectionInterface $from, $type, $comKey, $endpoint)
+    {
+        $webHook = $this->em->getRepository('AppBundle:WebHook')->findOneBy(['user' => $user, 'endpoint' => $endpoint]);
+        if (!$webHook) {
+            $this->answerError($from, $type, $comKey, 'No webHook found for this secret');
+        }
+
+        return $webHook;
+    }
+
+    /**
+     * @param $webHook
+     *
+     * @return bool
+     */
+    private function isWebHookRegistered($webHook)
+    {
+        $matchingWebHook = null;
+        foreach ($this->webHooks as $webHookItem) {
+            if ($webHook == $webHookItem) {
+                $matchingWebHook = $webHookItem;
+            }
+        }
+
+        return (bool)$matchingWebHook;
+    }
+
+    private function getSocketClients(WebHook $webHook)
+    {
+        $socketClients = [];
+        $clientEntities = $webHook->getClients();
+        foreach ($clientEntities as $clientEntity) {
+            $clientId = array_search($clientEntity, $this->clientEntities);
+            $socketClient = null;
+            foreach ($this->socketClients as $clientItem) {
+                if ($clientItem->resourceId == $clientId) {
+                    $socketClient = $clientItem;
+                    break;
+                }
+            }
+            $socketClients[] = $socketClient;
+        }
+
+        return $socketClients;
+    }
+
+    private function receiveAddWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
+    {
+        $endpoint = $msg['endpoint'];
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
+            $this->webHooks->add($webHook);
+            foreach ($this->getSocketClients($webHook) as $socketClient) {
+                $this->io->comment(
+                    "[{$from->resourceId}] Inform {$socketClient->resourceId} for the new WebHook \"{$endpoint}\""
+                );
+                $type = 'forwardAddWebHook';
+                $comKey = rand(100000, 999999);
+                $this->answer($socketClient, 'forwardAddWebHook', $comKey, ['endpoint' => $webHook->getEndpoint()]);
+            }
+            $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} added");
+            $this->answerOk($from, $type, $comKey);
+        }
+    }
+
+    private function receiveRemoveWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
+    {
+        $endpoint = $msg['endpoint'];
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
+            if ($this->isWebHookRegistered($webHook)) {
+                foreach ($this->getSocketClients($webHook) as $socketClient) {
+                    $this->io->comment(
+                        "[{$from->resourceId}] Inform {$socketClient->resourceId} for the \"{$endpoint}\" WebHook deletion"
+                    );
+                    $type = 'forwardRemoveWebHook';
+                    $comKey = rand(100000, 999999);
+                    $this->answer($socketClient, 'forwardRemoveWebHook', $comKey, ['endpoint' => $webHook->getEndpoint()]);
+                }
+                $this->webHooks->removeElement($webHook);
+                $this->answerOk($from, $type, $comKey);
+                $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} removed");
+            } else {
+                $this->answerError($from, $type, $comKey, '[REMOVE] WebHook was not registered');
+            }
+        }
+    }
+
+    private function receiveSendRequest(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        $this->io->comment("[{$from->resourceId}] Notification received");
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
+            if ($this->isWebHookRegistered($webHook)) {
+                // unlock external service response
+                $this->answerOk($from, $type, $comKey);
+
+                // forward request to users
+                $request = $msg['request'];
+                foreach ($this->getSocketClients($webHook) as $socketClient) {
+                    $this->io->comment("[{$from->resourceId}] Request sent to {$socketClient->resourceId}");
+                    $this->answer($socketClient, 'forwardRequest', $comKey, ['request' => $request]);
+                }
+            } else {
+                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+            }
+        }
+    }
+
+    private function retrieveConfigurationFromSecret(ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        $secret = $msg['secret'];
+        $user = $this->em->getRepository('AppBundle:User')->findOneBy(['secret' => $secret]);
+        if (!$user) {
+            $this->answerError($from, $type, $comKey, 'Invalid secret');
+
+            return;
+        }
+        $config = [
+            'socket_url' => $this->socketUrl,
+            'web_url'    => $this->webUrl,
+            'secret'     => $user->getSecret(),
+            'web_hooks'  => [],
+        ];
+        foreach ($user->getWebHooks() as $webHook) {
+            $config['web_hooks'][] = ['endpoint' => $webHook->getEndpoint()];
+        }
+        $this->answer($from, $type, $comKey, $config);
+        $this->io->comment("[{$from->resourceId}] Configuration retrieved for user {$user->getUsername()}");
+    }
+
+    private function subscribeWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
+            if ($this->isWebHookRegistered($webHook)) {
+                $clientEntity = $this->clientEntities[$from->resourceId];
+                $webHook->addClient($clientEntity);
+                $this->em->flush();
+                $this->io->comment("[{$from->resourceId}] Subscription to {$webHook->getEndpoint()}");
+                $this->answerOk($from, $type, $comKey);
+            } else {
+                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+            }
+        }
+    }
+
+    private function unsubscribeWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
+            if ($this->isWebHookRegistered($webHook)) {
+                $clientEntity = $this->clientEntities[$from->resourceId];
+                $webHook->removeClient($clientEntity);
+                $this->em->flush();
+                $this->io->comment("[{$from->resourceId}] Unsubscription to {$webHook->getEndpoint()}");
+            } else {
+                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+            }
         }
     }
 }
