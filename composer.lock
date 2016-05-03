@@ -1577,7 +1577,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook",
-                "reference": "91cdccb893793d1ea130ab8a0e52ea6890cfc8d5"
+                "reference": "1a667e9aac2edcc292746d9631713df5d7ed64f8"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1608,7 +1608,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-05-02 21:51:57"
+            "time": "2016-05-03 17:38:50"
         },
         {
             "name": "monolog/monolog",
