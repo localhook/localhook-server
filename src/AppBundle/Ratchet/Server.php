@@ -150,7 +150,7 @@ class Server implements MessageComponentInterface
 
     private function answer(ConnectionInterface $from, $type, $comKey, array $answer)
     {
-        $msg = json_encode(array_merge($answer, ['status' => 'ok', 'type' => '_' . $type, 'comKey' => $comKey]));
+        $msg = json_encode(array_merge(['status' => 'ok', 'type' => '_' . $type, 'comKey' => $comKey], $answer));
         $this->verboseLog("[{$from->resourceId}] <comment>MESSAGE SENT: {$msg}</comment>");
         $from->send($msg);
     }
