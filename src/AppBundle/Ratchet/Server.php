@@ -100,10 +100,10 @@ class Server implements MessageComponentInterface
 
                         // Client
                         case 'subscribeWebHook':
-                            $this->subscribeWebHook($user, $from, $msg, $type, $comKey);
+                            $this->attacheClientToWebHook($user, $from, $msg, $type, $comKey);
                             break;
                         case 'unsubscribeWebHook':
-                            $this->unsubscribeWebHook($user, $from, $msg, $type, $comKey);
+                            $this->detachClientFromWebHook($user, $from, $msg, $type, $comKey);
                             break;
                         default:
                             $this->answerError($from, $type, $comKey, 'Type "' . $type . '" not managed.');
@@ -189,7 +189,85 @@ class Server implements MessageComponentInterface
         return (bool)$matchingWebHook;
     }
 
-    private function getSocketClients(WebHook $webHook)
+    private function receiveAddWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
+    {
+        $endpoint = $msg['endpoint'];
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
+            $this->webHooks->add($webHook);
+            $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} added");
+            $this->answerOk($from, $type, $comKey);
+
+
+            $socketClients = $this->getAttachedSocketClients($webHook);
+            if (!count($socketClients)) {
+                $this->io->comment("[{$from->resourceId}] No client attached.");
+            }
+            foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
+                $this->io->comment(
+                    "[{$from->resourceId}] Inform {$socketClient->resourceId} for the new WebHook \"{$endpoint}\""
+                );
+                $type = 'forwardAddWebHook';
+                $comKey = rand(100000, 999999);
+                $this->answer($socketClient, $type, $comKey, ['endpoint' => $webHook->getEndpoint()]);
+            }
+        }
+    }
+
+    private function receiveRemoveWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
+    {
+        $endpoint = $msg['endpoint'];
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
+            if ($this->isWebHookRegistered($webHook)) {
+                foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
+                    $this->io->comment(
+                        "[{$from->resourceId}] Inform {$socketClient->resourceId} for the \"{$endpoint}\" WebHook deletion"
+                    );
+                    $type = 'forwardRemoveWebHook';
+                    $comKey = rand(100000, 999999);
+                    $this->answer($socketClient, $type, $comKey, ['endpoint' => $webHook->getEndpoint()]);
+                }
+                $this->webHooks->removeElement($webHook);
+                $this->answerOk($from, $type, $comKey);
+                $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} removed");
+            } else {
+                $this->answerError($from, $type, $comKey, '[REMOVE] WebHook was not registered');
+            }
+        }
+    }
+
+    private function attacheClientToWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
+            if ($this->isWebHookRegistered($webHook)) {
+                $clientEntity = $this->clientEntities[$from->resourceId];
+                $webHook->addClient($clientEntity);
+                $this->em->persist($webHook);
+                $this->em->flush();
+                $this->io->comment("[{$from->resourceId}] Client attached to {$webHook->getEndpoint()}");
+                $this->answerOk($from, $type, $comKey);
+            } else {
+                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+            }
+        } else {
+            $this->answerError($from, $type, $comKey, 'WebHook was not found');
+        }
+    }
+
+    private function detachClientFromWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
+    {
+        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
+            if ($this->isWebHookRegistered($webHook)) {
+                $clientEntity = $this->clientEntities[$from->resourceId];
+                $webHook->removeClient($clientEntity);
+                $this->em->flush();
+                $this->io->comment("[{$from->resourceId}] Client detached from {$webHook->getEndpoint()}");
+            } else {
+                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+            }
+        }
+    }
+
+    private function getAttachedSocketClients(WebHook $webHook)
     {
         $socketClients = [];
         $clientEntities = $webHook->getClients();
@@ -208,46 +286,6 @@ class Server implements MessageComponentInterface
         return $socketClients;
     }
 
-    private function receiveAddWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
-    {
-        $endpoint = $msg['endpoint'];
-        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
-            $this->webHooks->add($webHook);
-            foreach ($this->getSocketClients($webHook) as $socketClient) {
-                $this->io->comment(
-                    "[{$from->resourceId}] Inform {$socketClient->resourceId} for the new WebHook \"{$endpoint}\""
-                );
-                $type = 'forwardAddWebHook';
-                $comKey = rand(100000, 999999);
-                $this->answer($socketClient, 'forwardAddWebHook', $comKey, ['endpoint' => $webHook->getEndpoint()]);
-            }
-            $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} added");
-            $this->answerOk($from, $type, $comKey);
-        }
-    }
-
-    private function receiveRemoveWebHook(User $user, ConnectionInterface $from, $msg, $type, $comKey)
-    {
-        $endpoint = $msg['endpoint'];
-        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
-            if ($this->isWebHookRegistered($webHook)) {
-                foreach ($this->getSocketClients($webHook) as $socketClient) {
-                    $this->io->comment(
-                        "[{$from->resourceId}] Inform {$socketClient->resourceId} for the \"{$endpoint}\" WebHook deletion"
-                    );
-                    $type = 'forwardRemoveWebHook';
-                    $comKey = rand(100000, 999999);
-                    $this->answer($socketClient, 'forwardRemoveWebHook', $comKey, ['endpoint' => $webHook->getEndpoint()]);
-                }
-                $this->webHooks->removeElement($webHook);
-                $this->answerOk($from, $type, $comKey);
-                $this->io->comment("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} removed");
-            } else {
-                $this->answerError($from, $type, $comKey, '[REMOVE] WebHook was not registered');
-            }
-        }
-    }
-
     private function receiveSendRequest(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
     {
         $this->io->comment("[{$from->resourceId}] Notification received");
@@ -258,7 +296,7 @@ class Server implements MessageComponentInterface
 
                 // forward request to users
                 $request = $msg['request'];
-                foreach ($this->getSocketClients($webHook) as $socketClient) {
+                foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
                     $this->io->comment("[{$from->resourceId}] Request sent to {$socketClient->resourceId}");
                     $this->answer($socketClient, 'forwardRequest', $comKey, ['request' => $request]);
                 }
@@ -272,6 +310,7 @@ class Server implements MessageComponentInterface
     {
         $secret = $msg['secret'];
         $user = $this->em->getRepository('AppBundle:User')->findOneBy(['secret' => $secret]);
+        $this->em->refresh($user);
         if (!$user) {
             $this->answerError($from, $type, $comKey, 'Invalid secret');
 
@@ -288,34 +327,5 @@ class Server implements MessageComponentInterface
         }
         $this->answer($from, $type, $comKey, $config);
         $this->io->comment("[{$from->resourceId}] Configuration retrieved for user {$user->getUsername()}");
-    }
-
-    private function subscribeWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
-            if ($this->isWebHookRegistered($webHook)) {
-                $clientEntity = $this->clientEntities[$from->resourceId];
-                $webHook->addClient($clientEntity);
-                $this->em->flush();
-                $this->io->comment("[{$from->resourceId}] Subscription to {$webHook->getEndpoint()}");
-                $this->answerOk($from, $type, $comKey);
-            } else {
-                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
-            }
-        }
-    }
-
-    private function unsubscribeWebHook(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
-    {
-        if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
-            if ($this->isWebHookRegistered($webHook)) {
-                $clientEntity = $this->clientEntities[$from->resourceId];
-                $webHook->removeClient($clientEntity);
-                $this->em->flush();
-                $this->io->comment("[{$from->resourceId}] Unsubscription to {$webHook->getEndpoint()}");
-            } else {
-                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
-            }
-        }
     }
 }

@@ -45,6 +45,9 @@ class NotificationController extends Controller
             $this->socketAdminClient->executeSendRequest(
                 $webHook, $requestData, function () {
                 $this->socketAdminClient->stop();
+            }, function () {
+                $this->socketAdminClient->stop();
+                die('not found'); // fixme ratchet catch all exceptions
             });
         });
 
