@@ -29,11 +29,10 @@ class WebHookController extends Controller
      *
      * @Route("/", name="webhook_index")
      * @Method("GET")
-     * @param Request $request
      *
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         /** @var User $user */
         if ($this->isGranted('ROLE_ADMIN')) {
@@ -52,7 +51,7 @@ class WebHookController extends Controller
         return $this->render('webhook/index.html.twig', [
             'webHooks'      => $webHooks,
             'delete_forms'  => $deleteForms,
-            'socket_secret' => $this->getSocketSecret($request),
+            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -83,6 +82,9 @@ class WebHookController extends Controller
             $this->socketAdminClient->start(function () use ($webHook) {
                 $this->socketAdminClient->executeAddWebHook($webHook, function () {
                     $this->socketAdminClient->stop();
+                }, function ($msg) {
+                    $this->socketAdminClient->stop();
+                    die('Socket error:' . json_encode($msg)); // fixme ratchet catch all exceptions
                 });
             });
 
@@ -90,9 +92,9 @@ class WebHookController extends Controller
         }
 
         return $this->render('webhook/new.html.twig', [
-            'webHook'              => $webHook,
-            'form'                 => $form->createView(),
-            'socket_secret' => $this->getSocketSecret($request),
+            'webHook'       => $webHook,
+            'form'          => $form->createView(),
+            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -101,16 +103,15 @@ class WebHookController extends Controller
      * @Route("/{id}", name="webhook_show")
      * @Method("GET")
      *
-     * @param Request $request
      * @param WebHook $webHook
      *
      * @return Response
      */
-    public function showAction(Request $request, WebHook $webHook)
+    public function showAction(WebHook $webHook)
     {
         return $this->render('webhook/show.html.twig', [
-            'webHook'              => $webHook,
-            'socket_secret' => $this->getSocketSecret($request),
+            'webHook'       => $webHook,
+            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -142,7 +143,10 @@ class WebHookController extends Controller
                         $em->remove($webHook);
                         $em->flush();
                         $this->socketAdminClient->stop();
-                    });
+                    }, function ($msg) {
+                    $this->socketAdminClient->stop();
+                    die('Socket error:' . json_encode($msg)); // fixme ratchet catch all exceptions
+                });
             });
         }
 
@@ -167,6 +171,7 @@ class WebHookController extends Controller
     private function getSocketSecret()
     {
         $token = [$this->getParameter('socket_server_url'), $this->getUser()->getSecret()];
+
         return base64_encode(json_encode($token));
     }
 }

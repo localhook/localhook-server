@@ -40,19 +40,19 @@ class AdminClient extends AbstractClient implements ClientInterface
         ], $onSuccess, $onError);
     }
 
-    public function executeAddWebHook(WebHook $webHook, callable $onSuccess)
+    public function executeAddWebHook(WebHook $webHook, callable $onSuccess, callable $onError)
     {
         $this->defaultExecute('addWebHook', [
             'endpoint' => $webHook->getEndpoint(),
             'secret' => $webHook->getUser()->getSecret(),
-        ], $onSuccess);
+        ], $onSuccess, $onError);
     }
 
-    public function executeRemoveWebHook(WebHook $webHook, callable $onSuccess)
+    public function executeRemoveWebHook(WebHook $webHook, callable $onSuccess, callable $onError)
     {
         $this->defaultExecute('removeWebHook', [
             'endpoint' => $webHook->getEndpoint(),
             'secret' => $webHook->getUser()->getSecret(),
-        ], $onSuccess);
+        ], $onSuccess, $onError);
     }
 }
