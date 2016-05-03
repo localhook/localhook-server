@@ -44,6 +44,12 @@
                     {{ webHook.createdAt|date('Y-m-d H:i:s') }}
                 </td>
                 <td>
+                    <a class="btn btn-primary btn-sm" title="View {{ webHook.endpoint }}" href="{{ path('webhook_show', {id: webHook.id}) }}">
+                        <i class="glyphicon glyphicon-list-alt"></i>
+                        View {{ webHook.endpoint }}
+                    </a>
+                    <br><br>
+
                     {{ form_start(delete_forms[webHook.id]) }}
                     <button class="btn btn-default btn-xs" title="Delete {{ webHook.endpoint }}">
                         <i class="glyphicon glyphicon-remove"></i>
