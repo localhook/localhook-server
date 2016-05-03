@@ -24,3 +24,8 @@ services:
         class: AppBundle\UserBundle\EventListener\RegistrationInitializeListener
         tags:
             - { name: kernel.event_subscriber }
+
+    request_simulator:
+        class: AppBundle\RequestSimulator
+        arguments:
+          - "%notifications_prefix_url%"

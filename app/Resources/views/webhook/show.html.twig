@@ -4,15 +4,15 @@
 {{ parent() }}
 <script>
     $(function () {
-//        var conn = new WebSocket('ws://127.0.0.1:1337');
-//        conn.onopen = function (e) {
-//            console.log("Connection established!");
-//            conn.send('{"type":"subscribeWebHook","comKey":359635,"secret":"293d9c1500091f270f3c5edf5b74916959203798","endpoint":"titi"}');
-//        };
-//
-//        conn.onmessage = function (e) {
-//            console.log(e.data);
-//        };
+        var conn = new WebSocket('ws://127.0.0.1:1337');
+        conn.onopen = function (e) {
+            console.log("Connection established!");
+            conn.send('{"type":"subscribeWebHook","comKey":359635,"secret":"293d9c1500091f270f3c5edf5b74916959203798","endpoint":"titi"}');
+        };
+
+        conn.onmessage = function (e) {
+            console.log(e.data);
+        };
     });
 </script>
 {% endblock %}
