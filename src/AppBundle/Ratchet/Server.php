@@ -323,12 +323,11 @@ class Server implements MessageComponentInterface
     {
         $secret = $msg['secret'];
         $user = $this->em->getRepository('AppBundle:User')->findOneBy(['secret' => $secret]);
-        $this->em->refresh($user);
         if (!$user) {
             $this->answerError($from, $type, $comKey, 'Invalid secret');
-
             return;
         }
+        $this->em->refresh($user);
         $config = [
             'socket_url' => $this->socketUrl,
             'web_url'    => $this->webUrl,

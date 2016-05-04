@@ -12,14 +12,14 @@ AppBundle\Entity\User:
         email: bob@example.com
         roles: [ROLE_USER]
         enabled: true
-        secret: <sha1()>
+        secret: 293d9c1500091f270f3c5edf5b74916959203798
     alice:
         username: alice
         plainPassword: alice
         email: alice@example.com
         roles: [ROLE_USER]
         enabled: true
-        secret: <sha1()>
+        secret: 383d9c1500091f270f3c5edf5b74916959203798
 
 AppBundle\Entity\WebHook:
     web_hook_{1..3}:
