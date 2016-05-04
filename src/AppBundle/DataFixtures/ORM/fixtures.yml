@@ -24,9 +24,6 @@ AppBundle\Entity\User:
 AppBundle\Entity\WebHook:
     web_hook_{1..3}:
         endpoint: webhook_<current()>
-        user: "@bob"
-    web_hook_{4..6}:
-        endpoint: webhook_<current()>
         user: "@alice"
 
 AppBundle\Entity\Notification:

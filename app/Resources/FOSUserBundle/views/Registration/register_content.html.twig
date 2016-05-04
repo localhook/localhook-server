@@ -1,8 +1,25 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
-{{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register form-horizontal'}}) }}
-    {{ form_widget(form) }}
-    <div>
-        <input type="submit" value="{{ 'registration.submit'|trans }}" />
+
+<div class="row">
+    <div class="col-lg-6 well col-lg-offset-3">
+        <h2 class="text-center">Quick register to Localhook!</h2>
+        <p>Just to let you manage your endpoints.</p>
+
+        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register form-horizontal'}}) }}
+
+        {{ form_widget(form) }}
+
+        <p class="text-center">
+            <button class="btn btn-success">
+                {{ 'registration.submit'|trans }}
+            </button>
+        </p>
+
+        <p><a href="{{ path('fos_user_security_login') }}">Already registered?</a></p>
+
+        {{ form_end(form) }}
     </div>
-{{ form_end(form) }}
+</div>
+
+

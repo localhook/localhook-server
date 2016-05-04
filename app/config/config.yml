@@ -37,6 +37,8 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
       socket_server_url: "%socket_server_url%"
+    form_themes:
+      - 'bootstrap_3_horizontal_layout.html.twig'
 
 # Doctrine Configuration
 doctrine:
