@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "79ceb7dff4cebdc268af0ae3b28a2550",
-    "content-hash": "a970ea455952f49fdd4b0daa18cace06",
+    "hash": "27ac93d08c48a0ba5f9b36f226781ddb",
+    "content-hash": "88fe79652d499950edccef97c8b37abe",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1573,11 +1573,11 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "dev-new_auth",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook",
-                "reference": "4ac1df91030a1efc9c0f728cf745611f8aebe512"
+                "reference": "c0ae7c8fc711061f455840bf90f693752cb00dfa"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1608,7 +1608,7 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-05-03 18:05:14"
+            "time": "2016-05-04 19:26:42"
         },
         {
             "name": "monolog/monolog",
@@ -2147,16 +2147,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "f942da7b505d1a294284ab343d05df42d02ad6d9"
+                "reference": "8025426794f1944de806618671d4fa476dc7626f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/f942da7b505d1a294284ab343d05df42d02ad6d9",
-                "reference": "f942da7b505d1a294284ab343d05df42d02ad6d9",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/8025426794f1944de806618671d4fa476dc7626f",
+                "reference": "8025426794f1944de806618671d4fa476dc7626f",
                 "shasum": ""
             },
             "require": {
@@ -2187,7 +2187,7 @@
                 }
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "time": "2016-03-31 13:10:33"
+            "time": "2016-05-03 17:50:52"
         },
         {
             "name": "react/socket",
@@ -4259,16 +4259,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "1.3.5",
+            "version": "1.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "dc7a29032cf72b54f36dac15a1ca5b3a1b6029bf"
+                "reference": "2292b116f43c272ff4328083096114f84ea46a56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/dc7a29032cf72b54f36dac15a1ca5b3a1b6029bf",
-                "reference": "dc7a29032cf72b54f36dac15a1ca5b3a1b6029bf",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/2292b116f43c272ff4328083096114f84ea46a56",
+                "reference": "2292b116f43c272ff4328083096114f84ea46a56",
                 "shasum": ""
             },
             "require": {
@@ -4305,7 +4305,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2016-02-26 18:40:46"
+            "time": "2016-05-04 07:59:13"
         },
         {
             "name": "sebastian/exporter",
