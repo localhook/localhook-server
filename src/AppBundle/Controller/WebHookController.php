@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Notification;
 use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
 use AppBundle\Form\WebHookType;
@@ -10,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -96,6 +98,62 @@ class WebHookController extends Controller
             'form'          => $form->createView(),
             'socket_secret' => $this->getSocketSecret(),
         ]);
+    }
+
+    /**
+     *
+     * @Route("/replay-notification/{id}", name="webhook_replay_notification")
+     * @Method({"GET"})
+     *
+     * @param Request      $request
+     * @param Notification $notification
+     *
+     * @return RedirectResponse|Response
+     */
+    public function replayNotificationAction(Request $request, Notification $notification)
+    {
+        $this->get('request_simulator')->replay($request, $notification);
+
+        return $this->redirectToRoute('webhook_show', ['id' => $notification->getWebHook()->getId()]);
+    }
+
+    /**
+     *
+     * @Route("/{id}/simulate-notification", name="webhook_simulate_notification")
+     * @Method({"GET"})
+     *
+     * @param WebHook $webHook
+     *
+     * @return RedirectResponse|Response
+     */
+    public function simulateNotificationAction(WebHook $webHook)
+    {
+        $this->get('request_simulator')->simulate($webHook->getEndpoint());
+
+        return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
+    }
+
+    /**
+     *
+     * @Route("/{id}/clear-notifications", name="webhook_clear_notification")
+     * @Method({"GET"})
+     *
+     * @param WebHook $webHook
+     *
+     * @return RedirectResponse|Response
+     * @internal param Request $request
+     * @internal param Notification $notification
+     *
+     */
+    public function clearNotificationsAction(WebHook $webHook)
+    {
+        $em = $this->get('doctrine.orm.default_entity_manager');
+        foreach ($webHook->getNotifications() as $notification) {
+            $em->remove($notification);
+        }
+        $em->flush();
+
+        return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
     }
 
     /**

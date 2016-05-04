@@ -29,3 +29,5 @@ services:
         class: AppBundle\RequestSimulator
         arguments:
           - "%notifications_prefix_url%"
+          - "@router"
+          - "@kernel"

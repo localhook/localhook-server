@@ -34,6 +34,7 @@ class WebHook
     /**
      * @var Notification[]|ArrayCollection
      * @ORM\OneToMany(targetEntity="Notification", mappedBy="webHook", cascade={"remove"}))
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      *
      */
     private $notifications;
