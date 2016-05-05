@@ -4,9 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Nelmio\Alice\Fixtures;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Process\Process;
 
 class WebHookControllerTest extends WebTestCase
@@ -19,16 +17,12 @@ class WebHookControllerTest extends WebTestCase
         fwrite(STDERR, print_r($var, true));
     }
 
-    /** @var Client */
-    private $client = null;
-
     /**
      * {@inheritDoc}
      */
     protected function setUp()
     {
         self::bootKernel();
-        // TODO Load fixtures
         $em = static::$kernel->getContainer()->get('doctrine.orm.default_entity_manager');
         $metaData = $em->getMetadataFactory()->getAllMetadata();
         if (!empty($metaData)) {
@@ -37,27 +31,6 @@ class WebHookControllerTest extends WebTestCase
             $tool->createSchema($metaData);
             Fixtures::load(static::$kernel->getRootDir() . '/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
         }
-    }
-
-    private function logIn()
-    {
-        $client = static::createClient();
-        $container = $client->getContainer();
-
-        $session = $container->get('session');
-        $userManager = $container->get('fos_user.user_manager');
-        $loginManager = $container->get('fos_user.security.login_manager');
-        $firewallName = $container->getParameter('fos_user.firewall_name');
-
-        $user = $userManager->findUserBy(['username' => 'admin']);
-        $loginManager->loginUser($firewallName, $user);
-
-        // save the login token into the session and put it in a cookie
-        $container->get('session')->set('_security_' . $firewallName,
-            serialize($container->get('security.token_storage')->getToken()));
-        $container->get('session')->save();
-        $client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
-        $this->client = $client;
     }
 
     public function testCompleteScenario()
@@ -75,33 +48,73 @@ class WebHookControllerTest extends WebTestCase
 
                 if (strpos($buffer, 'Run socket server on port')) {
 
-                    $this->logIn();
+                    $client = static::createClient();
+                    $client->followRedirects();
 
-                    // Create a new entry in the database
-                    $crawler = $this->client->request('GET', '/webhook/');
-                    dump($this->client->getResponse()->headers->all());
-                    die;
-                    $this->assertEquals(200, $this->client->getResponse()
-                                                          ->getStatusCode(), "Unexpected HTTP status code for GET /webhook/");
-                    $crawler = $this->client->click($crawler->selectLink('Create a new webhook')->link());
+                    $crawler = $client->request('GET', '/');
 
-                    // Fill in the form and submit it
-                    $form = $crawler->selectButton('Submit')->form([
-                        'web_hook[endpoint]' => 'webhook_test',
-                    ]);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("Welcome to Localhook!")')->count());
 
-                    $this->client->submit($form);
-                    $crawler = $this->client->followRedirect();
+                    $link = $form = $crawler->selectLink('Quick sign up!')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertGreaterThan(
+                        0,
+                        $crawler->filter('html:contains("Quick register to Localhook!")')->count()
+                    );
 
-                    // Check data in the show view
-                    $this->assertGreaterThan(0, $crawler->filter('a:contains("webhook_test")')
-                                                        ->count(), 'Missing element a:contains("webhook_test")');
-                    // Delete the entity
-                    $this->client->submit($crawler->selectButton('Delete webhook_test')->form());
-                    $this->client->followRedirect();
+                    $form = $crawler->selectButton('Register')->form();
+                    $form['fos_user_registration_form[email]'] = 'test@example.com';
+                    $form['fos_user_registration_form[username]'] = 'test';
+                    $form['fos_user_registration_form[plainPassword][first]'] = 'test';
+                    $form['fos_user_registration_form[plainPassword][second]'] = 'test';
+                    $crawler = $client->submit($form);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("The user has been created successfully")')
+                                                        ->count());
 
-                    // Check the entity has been delete on the list
-                    $this->assertNotRegExp('/webhook_test/', $this->client->getResponse()->getContent());
+                    $link = $form = $crawler->selectLink('Go to dashboard')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("List of your forwards")')->count());
+
+                    $link = $form = $crawler->selectLink('Create a new webhook')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("Create a new forward")')->count());
+
+                    $form = $crawler->selectButton('Submit')->form();
+                    $form['web_hook[endpoint]'] = 'test';
+                    $crawler = $client->submit($form);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("/test/notifications")')->count());
+
+                    $link = $form = $crawler->selectLink('View test')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
+
+                    $link = $form = $crawler->selectLink('Simulate notification')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertEquals(1, $crawler->filter('table#notifications>tbody>tr')->count());
+
+                    $link = $form = $crawler->selectLink('Replay')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertEquals(2, $crawler->filter('table#notifications>tbody>tr')->count());
+
+                    $link = $form = $crawler->selectLink('Clear notifications')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertEquals(0, $crawler->filter('table#notifications')->count());
+
+                    $link = $form = $crawler->selectLink('Back to the list of all endpoints')->link();
+                    $this->assertNotNull($link);
+                    $crawler = $client->click($link);
+                    $this->assertEquals(1, $crawler->filter('html:contains("List of your forwards")')->count());
+
+//                    $form = $crawler->selectButton('Delete test')->form();
+//                    $crawler = $client->submit($form);
+//                    $this->assertEquals(1, $crawler->filter('html:contains("Your endpoints list is empty")')->count());
 
                     $socketServerProcess->stop();
                 }
