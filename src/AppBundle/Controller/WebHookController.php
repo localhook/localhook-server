@@ -169,11 +169,32 @@ class WebHookController extends Controller
      */
     public function showAction(WebHook $webHook)
     {
+        $notifications = $webHook->getNotifications();
+        $notificationsData = [];
+        foreach ($notifications as $notification) {
+            $data = ['notification' => $notification];
+
+            $content = json_decode($notification->getContent(), true);
+            $data['content'] = array_merge($content, ['request' => $this->parseStr($content)]);
+            $notificationsData[] = $data;
+        }
+
         return $this->render('webhook/show.html.twig', [
             'webHook'                => $webHook,
+            'notificationsData'      => $notificationsData,
             'clearNotificationsForm' => $this->createClearNotificationsForm($webHook)->createView(),
             'socket_secret'          => $this->getSocketSecret(),
         ]);
+    }
+
+    private function parseStr($string)
+    {
+        parse_str($string, $array);
+        if ($array && count($array) && array_values($array)[0]) {
+            return $array;
+        }
+
+        return null;
     }
 
     /**
