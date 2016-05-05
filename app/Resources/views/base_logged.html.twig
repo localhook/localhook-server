@@ -23,6 +23,9 @@
                     <a href="{{ path('webhook_new') }}"><i class="glyphicon glyphicon-plus"></i> Create a new
                         webhook</a>
                 </li>
+                <li>
+                    <a href="{{ path('get_started') }}"><i class="glyphicon glyphicon-education"></i> Get started</a>
+                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li>
@@ -41,4 +44,4 @@
     </div>
 {% endblock %}
 
-{% block footer %}<p>Server secret is: <code id="server-secret">{{ socket_secret }}</code></p>{% endblock %}
+{% block footer %}{% endblock %}

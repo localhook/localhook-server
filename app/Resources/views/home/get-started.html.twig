@@ -1,0 +1,40 @@
+{% extends 'base_logged.html.twig' %}
+
+{% block body %}
+
+    <h1><i class="glyphicon glyphicon-education"></i> How does it work?</h1>
+
+    <div class="well">
+
+        <h3>1) Create a endpoint</h3>
+        <p>Click <a href="{{ path('webhook_new') }}">here</a> to create a endpoint.</p>
+
+        <h3>2) Install the client on you computer</h3>
+        <code>
+            $ curl -OSL https https://git.io/vwu9e -o localhook.phar && chmod +x localhook.phar
+        </code><br>
+        <code>
+            $ sudo mv localhook.phar /usr/local/bin/localhook
+        </code>
+
+        <h3>3) Copy your Localhook secret</h3>
+
+        <div class="input-group">
+            <span class="input-group-addon">Your secret:</span>
+            <input type="text" class="form-control" id="server-secret" value="{{ socket_secret }}" readonly/>
+            <span class="input-group-btn">
+              <button class="btn btn-default btn-clipboard" type="button"
+                      data-clipboard-target="#server-secret">
+                  Copy
+              </button>
+            </span>
+        </div>
+
+        <h3>4) Use the client</h3>
+
+        <code>
+            $ localhook run
+        </code>
+        <p>Fill the password you just copied.</p>
+    </div>
+{% endblock %}

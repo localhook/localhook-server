@@ -53,7 +53,6 @@ class WebHookController extends Controller
         return $this->render('webhook/index.html.twig', [
             'webHooks'      => $webHooks,
             'delete_forms'  => $deleteForms,
-            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -96,7 +95,6 @@ class WebHookController extends Controller
         return $this->render('webhook/new.html.twig', [
             'webHook'       => $webHook,
             'form'          => $form->createView(),
-            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -183,7 +181,6 @@ class WebHookController extends Controller
             'webHook'                => $webHook,
             'notificationsData'      => $notificationsData,
             'clearNotificationsForm' => $this->createClearNotificationsForm($webHook)->createView(),
-            'socket_secret'          => $this->getSocketSecret(),
         ]);
     }
 
@@ -269,12 +266,5 @@ class WebHookController extends Controller
                     ->add('id', HiddenType::class)
                     ->setMethod('DELETE')
                     ->getForm();
-    }
-
-    private function getSocketSecret()
-    {
-        $token = [$this->getParameter('socket_server_url'), $this->getUser()->getSecret()];
-
-        return base64_encode(json_encode($token));
     }
 }

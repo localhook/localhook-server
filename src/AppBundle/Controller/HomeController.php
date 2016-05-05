@@ -24,4 +24,29 @@ class HomeController extends Controller
             return $this->render('Home/index.html.twig');
         }
     }
+
+    /**
+     *
+     * @Route("/get-started", name="get_started")
+     * @Method("GET")
+     *
+     * @return RedirectResponse
+     */
+    public function getStartedAction()
+    {
+        if (!$this->isGranted('ROLE_USER')) {
+            return $this->render('Home/index.html.twig');
+        }
+
+        return $this->render('home/get-started.html.twig', [
+            'socket_secret' => $this->getSocketSecret(),
+        ]);
+    }
+
+    private function getSocketSecret()
+    {
+        $token = [$this->getParameter('socket_server_url'), $this->getUser()->getSecret()];
+
+        return base64_encode(json_encode($token));
+    }
 }
