@@ -5,7 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Notification;
 use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
-use AppBundle\Form\WebHookType;
+use AppBundle\Form\Type\WebHookType;
 use AppBundle\Ratchet\AdminClient;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -71,7 +71,7 @@ class WebHookController extends Controller
     public function newAction(Request $request)
     {
         $webHook = new WebHook();
-        $form = $this->createForm('AppBundle\Form\WebHookType', $webHook);
+        $form = $this->createForm('AppBundle\Form\Type\WebHookType', $webHook);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
