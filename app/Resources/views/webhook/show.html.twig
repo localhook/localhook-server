@@ -124,8 +124,8 @@
             </thead>
             <tbody>
             {% for notificationData in notificationsData %}
-                {% set notification = notification.notification %}
-                {% set content = notification.content %}
+                {% set notification = notificationData.notification %}
+                {% set content = notificationData.content %}
                 <tr id="notif-{{ notification.id }}">
                     <td>
                         <div class="label label-success">{{ content.method }}</div>
@@ -144,7 +144,7 @@
                         {% if content.body %}
                             {% if content.request %}
                                 <table class="table table-striped table-condensed">
-                                    {% for key, item in params %}
+                                    {% for key, item in content.request %}
                                         <tr>
                                             <th class="text-right">{{ key }}</th>
                                             <td>{{ item|join(';') }}</td>

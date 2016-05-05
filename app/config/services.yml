@@ -30,3 +30,4 @@ services:
           - "%notifications_prefix_url%"
           - "@router"
           - "@kernel"
+          - "@request_stack"

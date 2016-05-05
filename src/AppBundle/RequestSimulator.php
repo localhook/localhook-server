@@ -3,13 +3,11 @@
 namespace AppBundle;
 
 use AppBundle\Entity\Notification;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-#use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -31,11 +29,17 @@ class RequestSimulator
      */
     private $kernel;
 
-    public function __construct($notificationsPrefixUrl, Router $router, Kernel $kernel)
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    public function __construct($notificationsPrefixUrl, Router $router, Kernel $kernel, RequestStack $requestStack)
     {
         $this->notificationsPrefixUrl = $notificationsPrefixUrl;
         $this->router = $router;
         $this->kernel = $kernel;
+        $this->requestStack = $requestStack;
     }
 
     public function setIo(SymfonyStyle $io)
@@ -73,7 +77,11 @@ class RequestSimulator
         }
 
         $url = $this->router->generate('notifications', ['endpoint' => $endpoint]);
-        $request = Request::create($url, $method, [], [], [], $_SERVER, $body);
+        $server = [];
+        if ($this->requestStack && $currentRequest = $this->requestStack->getCurrentRequest()) {
+            $server = $currentRequest->server->all();
+        }
+        $request = Request::create($url, $method, [], [], [], $server, $body);
         $request->headers->replace($headers);
         $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST);
 

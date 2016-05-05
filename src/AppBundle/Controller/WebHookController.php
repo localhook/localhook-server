@@ -176,7 +176,7 @@ class WebHookController extends Controller
             $data = ['notification' => $notification];
 
             $content = json_decode($notification->getContent(), true);
-            $data['content'] = array_merge($content, ['request' => $this->parseStr($content)]);
+            $data['content'] = array_merge($content, ['request' => $this->parseStr($content['body'])]);
             $notificationsData[] = $data;
         }
 
