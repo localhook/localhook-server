@@ -25,7 +25,7 @@ class Notification
     /**
      * @var WebHook
      *
-     * @ORM\ManyToOne(targetEntity="WebHook")
+     * @ORM\ManyToOne(targetEntity="WebHook", inversedBy="notifications")
      * @ORM\JoinColumn()
      */
     private $webHook;

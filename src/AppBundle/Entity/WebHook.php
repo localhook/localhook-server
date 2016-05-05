@@ -49,7 +49,7 @@ class WebHook
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="webHooks")
      * @ORM\JoinColumn()
      */
     private $user;

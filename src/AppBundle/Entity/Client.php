@@ -25,7 +25,7 @@ class Client
     /**
      * @var WebHook
      *
-     * @ORM\ManyToOne(targetEntity="WebHook")
+     * @ORM\ManyToOne(targetEntity="WebHook", inversedBy="clients")
      * @ORM\JoinColumn()
      */
     private $webHook;
