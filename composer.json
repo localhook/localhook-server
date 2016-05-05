@@ -1,5 +1,6 @@
 {
     "name": "localhook/localhook-server",
+    "description" : "The Localhook server",
     "license": "MIT",
     "type": "project",
     "autoload": {
