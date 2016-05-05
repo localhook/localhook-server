@@ -11,9 +11,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SimulateNotificationCommand extends ContainerAwareCommand
 {
-    /** @var SymfonyStyle */
-    private $io;
-
     /** @var OutputInterface */
     private $output;
 
@@ -34,7 +31,6 @@ class SimulateNotificationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io = new SymfonyStyle($input, $output);
         $this->output = $output;
         $endpoint = $input->getArgument('endpoint');
 
