@@ -7,6 +7,7 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
 use AppBundle\Form\WebHookType;
 use AppBundle\Ratchet\AdminClient;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -86,7 +87,7 @@ class WebHookController extends Controller
                     $this->socketAdminClient->stop();
                 }, function ($msg) {
                     $this->socketAdminClient->stop();
-                    die('Socket error:' . json_encode($msg)); // fixme ratchet catch all exceptions
+                    throw new Exception('Socket error: ' . json_encode($msg));
                 });
             });
 
@@ -227,7 +228,7 @@ class WebHookController extends Controller
                         $this->socketAdminClient->stop();
                     }, function ($msg) {
                     $this->socketAdminClient->stop();
-                    die('Socket error:' . json_encode($msg)); // fixme ratchet catch all exceptions
+                    throw new Exception('Socket error: ' . json_encode($msg));
                 });
             });
         }

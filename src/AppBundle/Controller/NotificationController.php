@@ -51,7 +51,7 @@ class NotificationController extends Controller
                 $this->socketAdminClient->stop();
             }, function () {
                 $this->socketAdminClient->stop();
-                die('not found'); // fixme ratchet catch all exceptions
+                throw new NotFoundHttpException();
             });
         });
 
