@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Notification;
 use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
-use AppBundle\Form\Type\WebHookType;
 use AppBundle\Ratchet\AdminClient;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -114,9 +113,9 @@ class WebHookController extends Controller
     {
         $form = $this->createClearNotificationsForm();
         $form->handleRequest($request);
+        $em = $this->get('doctrine.orm.default_entity_manager');
+        $webHook = $em->getRepository('AppBundle:WebHook')->find($form->getData()['id']);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->get('doctrine.orm.default_entity_manager');
-            $webHook = $em->getRepository('AppBundle:WebHook')->find($form->getData()['id']);
             foreach ($webHook->getNotifications() as $notification) {
                 $em->remove($notification);
             }
