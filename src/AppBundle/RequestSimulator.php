@@ -73,7 +73,7 @@ class RequestSimulator
         }
 
         $url = $this->router->generate('notifications', ['endpoint' => $endpoint]);
-        $request = Request::create($url, $method, [], [], [], [], $body);
+        $request = Request::create($url, $method, [], [], [], $_SERVER, $body);
         $request->headers->replace($headers);
         $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST);
 
