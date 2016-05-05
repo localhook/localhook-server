@@ -50,7 +50,7 @@ class NotificationController extends Controller
     private function handleNotification(Request $request, $webHook)
     {
         $em = $this->get('doctrine.orm.default_entity_manager');
-        
+
         $notification = new Notification();
         $notification->setWebHook($webHook);
         $requestData = [

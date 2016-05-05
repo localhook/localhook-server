@@ -51,8 +51,8 @@ class WebHookController extends Controller
         }
 
         return $this->render('webhook/index.html.twig', [
-            'webHooks'      => $webHooks,
-            'delete_forms'  => $deleteForms,
+            'webHooks'     => $webHooks,
+            'delete_forms' => $deleteForms,
         ]);
     }
 
@@ -93,8 +93,8 @@ class WebHookController extends Controller
         }
 
         return $this->render('webhook/new.html.twig', [
-            'webHook'       => $webHook,
-            'form'          => $form->createView(),
+            'webHook' => $webHook,
+            'form'    => $form->createView(),
         ]);
     }
 
