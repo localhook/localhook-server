@@ -10,20 +10,20 @@ class WebHookType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('endpoint');
     }
-    
+
     /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\WebHook'
-        ));
+        $resolver->setDefaults([
+            'data_class' => 'AppBundle\Entity\WebHook',
+        ]);
     }
 }

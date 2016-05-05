@@ -37,7 +37,7 @@ class NotificationController extends Controller
             'method'  => $request->getMethod(),
             'headers' => $request->headers->all(),
             'query'   => $request->query->all(),
-            'body' => $request->getContent(),
+            'body'    => $request->getContent(),
             //'files'           => $request->files->all(),
         ];
         $notification->setContent(json_encode($requestData));

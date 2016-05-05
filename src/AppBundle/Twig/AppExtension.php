@@ -3,8 +3,6 @@
 namespace AppBundle\Twig;
 
 use Twig_Extension;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
 
 class AppExtension extends Twig_Extension
 {

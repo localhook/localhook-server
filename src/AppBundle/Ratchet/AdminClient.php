@@ -35,8 +35,8 @@ class AdminClient extends AbstractClient implements ClientInterface
     {
         $this->defaultExecute('sendRequest', [
             'endpoint' => $webHook->getEndpoint(),
-            'secret' => $webHook->getUser()->getSecret(),
-            'request' => $requestData,
+            'secret'   => $webHook->getUser()->getSecret(),
+            'request'  => $requestData,
         ], $onSuccess, $onError);
     }
 
@@ -44,7 +44,7 @@ class AdminClient extends AbstractClient implements ClientInterface
     {
         $this->defaultExecute('addWebHook', [
             'endpoint' => $webHook->getEndpoint(),
-            'secret' => $webHook->getUser()->getSecret(),
+            'secret'   => $webHook->getUser()->getSecret(),
         ], $onSuccess, $onError);
     }
 
@@ -52,7 +52,7 @@ class AdminClient extends AbstractClient implements ClientInterface
     {
         $this->defaultExecute('removeWebHook', [
             'endpoint' => $webHook->getEndpoint(),
-            'secret' => $webHook->getUser()->getSecret(),
+            'secret'   => $webHook->getUser()->getSecret(),
         ], $onSuccess, $onError);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace AppBundle\Command;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;

@@ -316,7 +316,7 @@ class Server implements MessageComponentInterface
         $request = $msg['request'];
         $this->logger->info("Notification received", [
             'endpoint' => $msg['endpoint'],
-            'request' => $msg['request'],
+            'request'  => $msg['request'],
             'conn'     => $from->resourceId, 'ck' => $comKey,
         ]);
         if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {

@@ -3,8 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\User as BaseUser;
 
 /**
  * @ORM\Entity
@@ -33,7 +33,8 @@ class User extends BaseUser
      */
     private $secret;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->webHooks = new ArrayCollection();
     }

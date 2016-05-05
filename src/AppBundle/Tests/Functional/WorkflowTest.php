@@ -2,7 +2,6 @@
 
 namespace AppBundle\Tests\Functional;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Nelmio\Alice\Fixtures;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Process\Process;
@@ -74,7 +73,6 @@ class WorkflowTest extends KernelTestCase
                     $watchNotificationErrorOutput = $watchNotificationProcess->getIncrementalErrorOutput();
                     $this->assertEquals(0, strlen($watchNotificationErrorOutput), $watchNotificationErrorOutput);
                     $this->assertEquals(0, $watchNotificationProcess->getExitCode());
-
 
                     $watchNotificationOutput = $watchNotificationProcess->getIncrementalOutput();
                     $this->assertContains('?get_param_1=get_value_1&get_param_2=get_value_2', $watchNotificationOutput);
