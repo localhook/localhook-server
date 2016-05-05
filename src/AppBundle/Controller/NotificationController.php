@@ -3,7 +3,9 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Notification;
+use AppBundle\Entity\WebHook;
 use AppBundle\Ratchet\AdminClient;
+use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,13 +26,29 @@ class NotificationController extends Controller
      */
     public function handleAction(Request $request, $endpoint)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->get('doctrine.orm.default_entity_manager');
         $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => $endpoint]);
 
         if (!$webHook) {
             throw new NotFoundHttpException('WebHook was not found.');
         }
 
+        $requestData = $this->handleNotification($request, $webHook, $em);
+
+        $this->forwardNotification($webHook, $requestData);
+
+        return new JsonResponse();
+    }
+
+    /**
+     * @param Request $request
+     * @param         $webHook
+     * @param         $em
+     *
+     * @return array
+     */
+    private function handleNotification(Request $request, $webHook, EntityManager $em)
+    {
         $notification = new Notification();
         $notification->setWebHook($webHook);
         $requestData = [
@@ -44,6 +62,15 @@ class NotificationController extends Controller
         $em->persist($notification);
         $em->flush();
 
+        return $requestData;
+    }
+
+    /**
+     * @param $webHook
+     * @param $requestData
+     */
+    private function forwardNotification(WebHook $webHook, $requestData)
+    {
         $this->socketAdminClient = $this->get('socket_admin_client');
         $this->socketAdminClient->start(function () use ($webHook, $requestData) {
             $this->socketAdminClient->executeSendRequest(
@@ -54,7 +81,5 @@ class NotificationController extends Controller
                 throw new NotFoundHttpException();
             });
         });
-
-        return new JsonResponse();
     }
 }
