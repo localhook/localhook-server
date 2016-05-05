@@ -10,8 +10,8 @@ use AppBundle\Ratchet\AdminClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,6 +102,31 @@ class WebHookController extends Controller
 
     /**
      *
+     * @Route("/clear-notifications", name="webhook_clear_notification")
+     * @Method({"DELETE"})
+     *
+     * @param Request $request
+     *
+     * @return RedirectResponse|Response
+     */
+    public function clearNotificationsAction(Request $request)
+    {
+        $form = $this->createClearNotificationsForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->get('doctrine.orm.default_entity_manager');
+            $webHook = $em->getRepository('AppBundle:WebHook')->find($form->getData()['id']);
+            foreach ($webHook->getNotifications() as $notification) {
+                $em->remove($notification);
+            }
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
+    }
+
+    /**
+     *
      * @Route("/replay-notification/{id}", name="webhook_replay_notification")
      * @Method({"GET"})
      *
@@ -135,29 +160,6 @@ class WebHookController extends Controller
 
     /**
      *
-     * @Route("/{id}/clear-notifications", name="webhook_clear_notification")
-     * @Method({"GET"})
-     *
-     * @param WebHook $webHook
-     *
-     * @return RedirectResponse|Response
-     * @internal param Request $request
-     * @internal param Notification $notification
-     *
-     */
-    public function clearNotificationsAction(WebHook $webHook)
-    {
-        $em = $this->get('doctrine.orm.default_entity_manager');
-        foreach ($webHook->getNotifications() as $notification) {
-            $em->remove($notification);
-        }
-        $em->flush();
-
-        return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
-    }
-
-    /**
-     *
      * @Route("/{id}", name="webhook_show")
      * @Method("GET")
      *
@@ -168,8 +170,9 @@ class WebHookController extends Controller
     public function showAction(WebHook $webHook)
     {
         return $this->render('webhook/show.html.twig', [
-            'webHook'       => $webHook,
-            'socket_secret' => $this->getSocketSecret(),
+            'webHook'                => $webHook,
+            'clearNotificationsForm' => $this->createClearNotificationsForm($webHook)->createView(),
+            'socket_secret'          => $this->getSocketSecret(),
         ]);
     }
 
@@ -222,6 +225,27 @@ class WebHookController extends Controller
     {
         return $this->createFormBuilder()
                     ->setAction($this->generateUrl('webhook_delete', ['id' => $webHook->getId()]))
+                    ->setMethod('DELETE')
+                    ->getForm();
+    }
+
+    /**
+     *
+     * @param WebHook $webHook The WebHook entity
+     *
+     * @return Form The form
+     */
+    private function createClearNotificationsForm(WebHook $webHook = null)
+    {
+        if ($webHook) {
+            $data = ['id' => $webHook->getId()];
+        } else {
+            $data = null;
+        }
+
+        return $this->createFormBuilder($data)
+                    ->setAction($this->generateUrl('webhook_clear_notification'))
+                    ->add('id', HiddenType::class)
                     ->setMethod('DELETE')
                     ->getForm();
     }
