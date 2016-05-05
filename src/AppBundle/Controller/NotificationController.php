@@ -5,7 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Notification;
 use AppBundle\Entity\WebHook;
 use AppBundle\Ratchet\AdminClient;
-use Doctrine\ORM\EntityManager;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +19,7 @@ class NotificationController extends Controller
 
     /**
      * @Route("{endpoint}/notifications", name="notifications")
+     * @Method({"GET", "POST", "PUT"})
      * @param Request $request
      * @param string  $endpoint
      *
@@ -33,7 +34,7 @@ class NotificationController extends Controller
             throw new NotFoundHttpException('WebHook was not found.');
         }
 
-        $requestData = $this->handleNotification($request, $webHook, $em);
+        $requestData = $this->handleNotification($request, $webHook);
 
         $this->forwardNotification($webHook, $requestData);
 
@@ -43,12 +44,13 @@ class NotificationController extends Controller
     /**
      * @param Request $request
      * @param         $webHook
-     * @param         $em
      *
      * @return array
      */
-    private function handleNotification(Request $request, $webHook, EntityManager $em)
+    private function handleNotification(Request $request, $webHook)
     {
+        $em = $this->get('doctrine.orm.default_entity_manager');
+        
         $notification = new Notification();
         $notification->setWebHook($webHook);
         $requestData = [
