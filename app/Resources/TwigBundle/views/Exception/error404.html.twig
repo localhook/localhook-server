@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block github_fork_me %}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="well col-lg-4 col-lg-offset-4 text-center">
+            <h1>Error 404</h1>
+            <h4>Page was not found. Too bad..</h4>
+            <p>This URL is not available.</p>
+
+            <p>
+                <a href="{{ path('index') }}" class="btn btn-primary btn-lg">
+                    <i class="glyphicon glyphicon-home"></i>
+                    Go back home!
+                </a>
+            </p>
+        </div>
+    </div>
+    <br><br>
+{% endblock %}
