@@ -79,4 +79,9 @@ class User extends BaseUser
     {
         return $this->secret;
     }
+
+    public function getSalt()
+    {
+        return null;
+    }
 }
