@@ -1,10 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1><i class="glyphicon glyphicon-list"></i> Welcome to Localhook!</h1>
+    <div class="text-center">
+        <div style="background: #ecf0f1;width: 200px;border-radius: 100px;height: 200px;display: inline-block;">
+            <img src="{{ asset('hook.png') }}" width="160" alt="">
+        </div>
+        <h1>Welcome to Localhook!</h1>
+        <p>Get webhook notification forwarded to you local host in a second.</p>
+    </div>
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-4 col-lg-offset-1">
             <div class="well">
                 <div class="text-center">
                     <h4>Already a user?</h4>
@@ -16,11 +22,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-4 col-lg-offset-2">
             <div class="well">
                 <div class="text-center">
                     <h4>New user?</h4>
-                    <p>Quick sign up in 2 seconds! (username, login, password)</p>
+                    <p>Quick sign up in 2 seconds!</p>
                     <a class="btn btn-primary" href="{{ path('fos_user_registration_register') }}">
                         <i class="glyphicon glyphicon-plus"></i>
                         Quick sign up!
