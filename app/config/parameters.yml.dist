@@ -21,6 +21,6 @@ parameters:
 
     basic_auth_password: admin
     socket_port: 1337
-    socket_client_secret: please-change-this-secret
-    socket_server_secret: please-change-this-other-secret
-    notifications_prefix_url: http://localhost:8000
+    notifications_prefix_url: http://127.0.0.1:8000
+    socket_server_url: 'ws://127.0.0.1:1337'
+    web_server_url: 'http://127.0.0.1:8000'

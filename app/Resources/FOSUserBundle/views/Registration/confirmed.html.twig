@@ -1,0 +1,21 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+    <div class="row">
+        <div class="well col-lg-6 col-lg-offset-3">
+            <h4>Welcome</h4>
+
+            <p>{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
+
+            <p class="text-center">
+                <a href="{{ path('webhook_index') }}" class="btn btn-success">Go to dashboard</a>
+            </p>
+
+            {% if targetUrl %}
+                <p><a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a></p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock fos_user_content %}

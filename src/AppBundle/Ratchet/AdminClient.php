@@ -2,18 +2,15 @@
 
 namespace AppBundle\Ratchet;
 
+use AppBundle\Entity\WebHook;
 use Exception;
 use Localhook\Localhook\Ratchet\AbstractClient;
 use Localhook\Localhook\Ratchet\ClientInterface;
 
 class AdminClient extends AbstractClient implements ClientInterface
 {
-    private $serverSecret;
-
-    public function __construct($url, $serverSecret)
+    public function __construct($url)
     {
-        $this->serverSecret = $serverSecret;
-        $this->defaultFields = ['serverSecret' => $this->serverSecret];
         parent::__construct($url);
     }
 
@@ -34,25 +31,28 @@ class AdminClient extends AbstractClient implements ClientInterface
         }
     }
 
-    public function executeSendRequest($webHookSecret, array $requestData, callable $onSuccess)
+    public function executeSendRequest(WebHook $webHook, array $requestData, callable $onSuccess, callable $onError)
     {
         $this->defaultExecute('sendRequest', [
-            'webHookSecret' => $webHookSecret,
+            'endpoint' => $webHook->getEndpoint(),
+            'secret' => $webHook->getUser()->getSecret(),
             'request' => $requestData,
-        ], $onSuccess);
+        ], $onSuccess, $onError);
     }
 
-    public function executeAddWebHook($webHookSecret, callable $onSuccess)
+    public function executeAddWebHook(WebHook $webHook, callable $onSuccess, callable $onError)
     {
         $this->defaultExecute('addWebHook', [
-            'webHookSecret' => $webHookSecret,
-        ], $onSuccess);
+            'endpoint' => $webHook->getEndpoint(),
+            'secret' => $webHook->getUser()->getSecret(),
+        ], $onSuccess, $onError);
     }
 
-    public function executeRemoveWebHook($webHookSecret, callable $onSuccess)
+    public function executeRemoveWebHook(WebHook $webHook, callable $onSuccess, callable $onError)
     {
         $this->defaultExecute('removeWebHook', [
-            'webHookSecret' => $webHookSecret,
-        ], $onSuccess);
+            'endpoint' => $webHook->getEndpoint(),
+            'secret' => $webHook->getUser()->getSecret(),
+        ], $onSuccess, $onError);
     }
 }

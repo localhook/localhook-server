@@ -26,30 +26,15 @@ class WebHook
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=40)
-     *
-     */
-    private $privateKey;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(type="string", length=255)
      *
      */
     private $endpoint;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
-     *
-     */
-    private $username;
-
-    /**
      * @var Notification[]|ArrayCollection
      * @ORM\OneToMany(targetEntity="Notification", mappedBy="webHook", cascade={"remove"}))
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      *
      */
     private $notifications;
@@ -60,6 +45,14 @@ class WebHook
      *
      */
     private $clients;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="webHooks")
+     * @ORM\JoinColumn()
+     */
+    private $user;
 
     /**
      * @var \DateTime
@@ -105,22 +98,6 @@ class WebHook
     /**
      * @return string
      */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
-
-    /**
-     * @return string
-     */
     public function getEndpoint()
     {
         return $this->endpoint;
@@ -132,22 +109,6 @@ class WebHook
     public function setEndpoint($endpoint)
     {
         $this->endpoint = $endpoint;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrivateKey()
-    {
-        return $this->privateKey;
-    }
-
-    /**
-     * @param string $privateKey
-     */
-    public function setPrivateKey($privateKey)
-    {
-        $this->privateKey = $privateKey;
     }
 
     /**
@@ -191,5 +152,21 @@ class WebHook
     {
         $this->clients->remove($client);
         $client->setWebHook(null);
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 }

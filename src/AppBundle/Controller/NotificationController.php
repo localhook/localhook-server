@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class NotificationController extends Controller
 {
@@ -26,14 +27,17 @@ class NotificationController extends Controller
         $em = $this->getDoctrine()->getManager();
         $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => $endpoint]);
 
+        if (!$webHook) {
+            throw new NotFoundHttpException('WebHook was not found.');
+        }
+
         $notification = new Notification();
         $notification->setWebHook($webHook);
         $requestData = [
             'method'  => $request->getMethod(),
             'headers' => $request->headers->all(),
             'query'   => $request->query->all(),
-            'request' => $request->request->all(),
-            'content' => $request->getContent()
+            'body' => $request->getContent(),
             //'files'           => $request->files->all(),
         ];
         $notification->setContent(json_encode($requestData));
@@ -43,8 +47,11 @@ class NotificationController extends Controller
         $this->socketAdminClient = $this->get('socket_admin_client');
         $this->socketAdminClient->start(function () use ($webHook, $requestData) {
             $this->socketAdminClient->executeSendRequest(
-                $webHook->getPrivateKey(), $requestData, function () {
+                $webHook, $requestData, function () {
                 $this->socketAdminClient->stop();
+            }, function () {
+                $this->socketAdminClient->stop();
+                die('not found'); // fixme ratchet catch all exceptions
             });
         });
 

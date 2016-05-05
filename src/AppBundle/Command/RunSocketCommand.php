@@ -20,9 +20,6 @@ class RunSocketCommand extends ContainerAwareCommand
     /** @var string */
     private $socketPort;
 
-    /** @var string */
-    private $serverSecret;
-
     protected function configure()
     {
         $this
@@ -33,19 +30,22 @@ class RunSocketCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io = new SymfonyStyle($input, $output);
+        $this->io->block('Running server...');
+        $this->io->note('for more verbosity, add "-vv" or "-vvv" end the end of this command.');
         $this->socketPort = $this->getContainer()->getParameter('socket_port');
-        $this->serverSecret = $this->getContainer()->getParameter('socket_server_secret');
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        $logger = $this->getContainer()->get('logger');
+        $socketUrl = $this->getContainer()->getParameter('socket_url');
+        $webUrl = $this->getContainer()->getParameter('web_server_url');
         $webHooks = $em->getRepository('AppBundle:WebHook')->findAll();
-        $this->io->comment(count($webHooks) . ' webHook(s)');
-        $server = new Server($em, $webHooks, $this->serverSecret);
-        $server->setIo($this->io);
+        $logger->info(count($webHooks) . ' webHook(s)');
+        $server = new Server($em, $webHooks, $webUrl, $socketUrl, $logger);
 
         $this->killExistingSocketServer();
 
         $ioServer = IoServer::factory(new HttpServer(new WsServer($server)), $this->socketPort);
-        $this->io->comment('Run socket server on port ' . $this->socketPort . '...');
+        $logger->info('Run socket server on port ' . $this->socketPort . '...');
         $ioServer->run();
     }
 

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block navbar %}
+    <div class="navbar navbar-default navbar-fixed-top">
+
+        <div class="navbar-header">
+            <a href="{{ path('webhook_index') }}" class="navbar-brand"><i
+                        class="glyphicon glyphicon-cloud-download"></i> Localhook</a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{ path('webhook_index') }}"><i class="glyphicon glyphicon-list"></i> Webhooks</a>
+                </li>
+                <li>
+                    <a href="{{ path('webhook_new') }}"><i class="glyphicon glyphicon-plus"></i> Create a new
+                        webhook</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="{{ path('fos_user_profile_edit') }}"><i
+                                class="glyphicon glyphicon-user"></i> {{ app.user.username }}</a>
+                </li>
+                <li>
+                    <a href="{{ path('fos_user_security_logout') }}">
+                        <i class="glyphicon glyphicon-log-out"></i>
+                        Logout
+                        &nbsp;
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}<p>Server secret is: <code id="server-secret">{{ socket_secret }}</code></p>{% endblock %}

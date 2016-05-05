@@ -1,0 +1,50 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block fos_user_content %}
+    <div class="row">
+        <div class="col-lg-6 well col-lg-offset-3">
+            <h2 class="text-center">Login</h4>
+            <p>Login with your email/username and password.</p>
+
+            {% if error %}
+                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form class="form" action="{{ path("fos_user_security_check") }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+
+                <div class="form-group">
+                    <label for="username" class="col-lg-2 control-label">{{ 'security.login.username'|trans }}</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control" id="username" placeholder="Login" name="_username"
+                               required="required">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="col-lg-2 control-label">{{ 'security.login.password'|trans }}</label>
+                    <div class="col-lg-10">
+                        <input type="password" class="form-control" id="password" placeholder="Password"
+                               name="_password" required="required">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="remember_me" name="_remember_me" value="on"/>
+                                {{ 'security.login.remember_me'|trans }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center">
+                    <button class="btn btn-success" id="_submit" name="_submit">
+                        {{ 'security.login.submit'|trans }}
+                    </button>
+                </p>
+
+                <p><a href="{{ path('fos_user_registration_register') }}">Not already registered?</a></p>
+            </form>
+        </div>
+    </div>
+{% endblock fos_user_content %}

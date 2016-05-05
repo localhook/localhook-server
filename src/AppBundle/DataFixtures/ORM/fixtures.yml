@@ -1,10 +1,33 @@
+AppBundle\Entity\User:
+    admin:
+        username: admin
+        plainPassword: admin
+        email: admin@example.com
+        roles: [ROLE_ADMIN]
+        enabled: true
+        secret: da39a3ee5e6b4b0d3255bfef95601890afd80709
+    bob:
+        username: bob
+        plainPassword: bob
+        email: bob@example.com
+        roles: [ROLE_USER]
+        enabled: true
+        secret: 293d9c1500091f270f3c5edf5b74916959203798
+    alice:
+        username: alice
+        plainPassword: alice
+        email: alice@example.com
+        roles: [ROLE_USER]
+        enabled: true
+        secret: 383d9c1500091f270f3c5edf5b74916959203798
+
 AppBundle\Entity\WebHook:
     web_hook_{1..3}:
         endpoint: webhook_<current()>
-        privateKey: <current()>----------------------------------
-        username: admin
+        user: "@alice"
+
 AppBundle\Entity\Notification:
-    notification_{1..6}:
+    notification_{1..20}:
         webHook: "@web_hook_*"
         content: |
           {"method":"POST","headers":{"host":["localhost:8000"],"content-length":["0"],"user-agent":["GuzzleHttp\/6.2.0 curl\/7.43.0 PHP\/7.0.2"],"json":["post_value_1"],"x-php-ob-level":[1]},"query":{"get_param_1":"get_value_1","get_param_2":"get_value_2"},"request":{"post_param_1":"post_value_1","post_param_2":"post_value_2"}}

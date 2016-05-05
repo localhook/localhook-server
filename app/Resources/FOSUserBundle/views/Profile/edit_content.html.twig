@@ -1,0 +1,20 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+<div class="row">
+    <div class="col-lg-6 well col-lg-offset-3">
+        <h2 class="text-center">Edit your profile!</h2>
+
+        {{ form_start(form, { 'action': path('fos_user_profile_edit'), 'attr': { 'class': 'fos_user_profile_edit form-horizontal' } }) }}
+
+        {{ form_widget(form) }}
+
+        <p class="text-center">
+            <button class="btn btn-success">
+                {{ 'profile.edit.submit'|trans }}
+            </button>
+        </p>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
