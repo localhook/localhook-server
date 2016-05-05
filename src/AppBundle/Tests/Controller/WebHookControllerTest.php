@@ -23,6 +23,7 @@ class WebHookControllerTest extends WebTestCase
     protected function setUp()
     {
         self::bootKernel();
+        $this->socketPort = static::$kernel->getContainer()->getParameter('socket_port');
         $em = static::$kernel->getContainer()->get('doctrine.orm.default_entity_manager');
         $metaData = $em->getMetadataFactory()->getAllMetadata();
         if (!empty($metaData)) {
@@ -35,17 +36,11 @@ class WebHookControllerTest extends WebTestCase
 
     public function testCompleteScenario()
     {
-        $this->socketPort = static::$kernel->getContainer()->getParameter('socket_port');
-
-        $socketServerProcess = new Process('php app/console app:run-socket');
+        $socketServerProcess = new Process('php app/console app:run-socket -vvv -e test');
         $socketServerProcess->setTimeout(null)->start();
-        $kernel = static::$kernel;
-        $socketServerProcess->wait(function ($type, $buffer) use ($kernel, $socketServerProcess) {
+        $socketServerProcess->wait(function ($type, $buffer) use ($socketServerProcess) {
             if (Process::ERR === $type) {
-                self::dump('SOCKET ERR > ' . $buffer);
-            } else {
-                //self::dump($buffer);
-
+                self::dump('SOCKET OUT > ' . $buffer);
                 if (strpos($buffer, 'Run socket server on port')) {
 
                     $client = static::createClient();
@@ -82,40 +77,59 @@ class WebHookControllerTest extends WebTestCase
                     $crawler = $client->click($link);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("Create a new forward")')->count());
 
-                    $form = $crawler->selectButton('Submit')->form();
-                    $form['web_hook[endpoint]'] = 'test';
-                    $crawler = $client->submit($form);
-                    $this->assertGreaterThan(0, $crawler->filter('html:contains("/test/notifications")')->count());
-
-                    $link = $form = $crawler->selectLink('View test')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
-
-                    $link = $form = $crawler->selectLink('Simulate notification')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertEquals(1, $crawler->filter('table#notifications>tbody>tr')->count());
-
-                    $link = $form = $crawler->selectLink('Replay')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertEquals(2, $crawler->filter('table#notifications>tbody>tr')->count());
-
-                    $link = $form = $crawler->selectLink('Clear notifications')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertEquals(0, $crawler->filter('table#notifications')->count());
-
-                    $link = $form = $crawler->selectLink('Back to the list of all endpoints')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertEquals(1, $crawler->filter('html:contains("List of your forwards")')->count());
-
-//                    $form = $crawler->selectButton('Delete test')->form();
+//                    $client->insulate();
+//
+//                    $form = $crawler->selectButton('Submit')->form();
+//                    $form['web_hook[endpoint]'] = 'test';
 //                    $crawler = $client->submit($form);
-//                    $this->assertEquals(1, $crawler->filter('html:contains("Your endpoints list is empty")')->count());
+//                    $this->assertGreaterThan(0, $crawler->filter('html:contains("/test/notifications")')->count());
+//
+//                    $link = $form = $crawler->selectLink('View test')->link();
+//                    $this->assertNotNull($link);
+//                    $crawler = $client->click($link);
+//                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
+////                    $serverSecret = $crawler->filter('code#server-secret')->text();
+////                    // Start notification watcher
+////                    $watchNotificationProcess = new Process(
+////                        'bin/localhook delete-configuration; bin/localhook run test ' .
+////                        '"http://127.0.0.1/" --config-key="' . $serverSecret . '" --max=1 -vvv'
+////                    );
+////                    $watchNotificationProcess->setTimeout(null)->start();
+//
+//                    $link = $form = $crawler->selectLink('Simulate notification')->link();
+//                    $this->assertNotNull($link);
+//                    $crawler = $client->click($link);
+//                    $this->assertEquals(1, $crawler->filter('table#notifications>tbody>tr')->count());
+//
+//                    while ($watchNotificationProcess->isRunning()) {
+//                        self::dump($watchNotificationProcess->getIncrementalOutput());
+//                        // waiting for process to finish
+//                    }
+//
+//                    //$this->assertEquals(0, strlen($watchNotificationErrorOutput), $watchNotificationErrorOutput);
+//                    //$this->assertEquals(0, $watchNotificationProcess->getExitCode());
+//                    //$this->assertContains('Max forward reached', $watchNotificationOutput);
+//
+//                    $link = $form = $crawler->selectLink('Replay')->link();
+//                    $this->assertNotNull($link);
+//                    $crawler = $client->click($link);
+//                    $this->assertEquals(2, $crawler->filter('table#notifications>tbody>tr')->count());
 
+//                    $link = $form = $crawler->selectLink('Clear notifications')->link();
+//                    $this->assertNotNull($link);
+//                    $crawler = $client->click($link);
+//                    $this->assertEquals(0, $crawler->filter('table#notifications')->count());
+//
+//                    $link = $form = $crawler->selectLink('Back to the list of all endpoints')->link();
+//                    $this->assertNotNull($link);
+//                    $crawler = $client->click($link);
+//                    $this->assertEquals(1, $crawler->filter('html:contains("List of your forwards")')->count());
+////
+//////                    $form = $crawler->selectButton('Delete test')->form();
+//////                    $crawler = $client->submit($form);
+//////                    $this->assertEquals(1, $crawler->filter('html:contains("Your endpoints list is empty")')->count());
+////
+//                    $this->assertEquals('', $socketServerProcess->getIncrementalErrorOutput());
                     $socketServerProcess->stop();
                 }
             }

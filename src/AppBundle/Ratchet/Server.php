@@ -7,17 +7,13 @@ use AppBundle\Entity\WebHook;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use SplObjectStorage;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Server implements MessageComponentInterface
 {
-    /** @var SymfonyStyle */
-    private $io;
-
     /** @var SplObjectStorage */
     protected $socketClients;
 
@@ -36,29 +32,25 @@ class Server implements MessageComponentInterface
     /** @var string */
     private $webUrl;
 
-    public function __construct(EntityManager $em, $webHooks, $webUrl, $socketUrl)
-    {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(
+        EntityManager $em,
+        $webHooks,
+        $webUrl,
+        $socketUrl,
+        LoggerInterface $logger
+    ) {
         $this->em = $em;
         $this->webHooks = new ArrayCollection($webHooks);
         $this->socketClients = new SplObjectStorage;
         $this->purgeClients();
         $this->socketUrl = $socketUrl;
         $this->webUrl = $webUrl;
-    }
-
-    public function setIo(SymfonyStyle $io)
-    {
-        $this->io = $io;
-    }
-
-    /**
-     * @param string $msg
-     */
-    protected function verboseLog($msg)
-    {
-        if ($this->io && $this->io->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
-            $this->io->comment($msg);
-        }
+        $this->logger = $logger;
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -69,7 +61,7 @@ class Server implements MessageComponentInterface
         $this->em->persist($clientEntity);
         $this->em->flush();
         $this->clientEntities[$conn->resourceId] = $clientEntity;
-        $this->io->text("[{$conn->resourceId}] Connection");
+        $this->logger->info("Connection", ['conn' => $conn->resourceId]);
     }
 
     public function onClose(ConnectionInterface $conn)
@@ -79,12 +71,12 @@ class Server implements MessageComponentInterface
         $this->em->flush();
         // The connection is closed, remove it, as we can no longer send it messages
         $this->socketClients->detach($conn);
-        $this->io->text("[{$conn->resourceId}] Disconnection");
+        $this->logger->info("Disconnection", ['conn' => $conn->resourceId]);
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $this->verboseLog("[{$from->resourceId}] <info>MESSAGE RECEIVED: {$msg}</info>");
+        $this->logger->debug("MESSAGE RECEIVED", ['message' => $msg, 'conn' => $from->resourceId]);
         $msg = json_decode($msg, true);
         if (isset($msg['type'])) {
             $type = $msg['type'];
@@ -125,7 +117,7 @@ class Server implements MessageComponentInterface
                 }
             }
         } else {
-            $this->io->error('Missing "type" in message');
+            $this->logger->error('Missing "type" in message', ['message' => $msg, 'conn' => $from->resourceId]);
         }
     }
 
@@ -141,7 +133,7 @@ class Server implements MessageComponentInterface
 
     private function answerError(ConnectionInterface $from, $type, $comKey, $errorMessage)
     {
-        $this->io->error("[{$from->resourceId}] " . $errorMessage);
+        $this->logger->error($errorMessage, ['errorMessage' => $errorMessage, 'conn' => $from->resourceId]);
         $this->answer($from, $type, $comKey, [
             'status'  => 'error',
             'message' => $errorMessage,
@@ -151,7 +143,7 @@ class Server implements MessageComponentInterface
     private function answer(ConnectionInterface $from, $type, $comKey, array $answer)
     {
         $msg = json_encode(array_merge(['status' => 'ok', 'type' => '_' . $type, 'comKey' => $comKey], $answer));
-        $this->verboseLog("[{$from->resourceId}] <comment>MESSAGE SENT: {$msg}</comment>");
+        $this->logger->debug("MESSAGE SENT", ['message' => $msg, 'conn' => $from->resourceId]);
         $from->send($msg);
     }
 
@@ -207,16 +199,22 @@ class Server implements MessageComponentInterface
         $endpoint = $msg['endpoint'];
         if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
             $this->webHooks->add($webHook);
-            $this->io->text("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} added");
+            $this->logger->info("WebHook added", [
+                'endpoint' => $webHook->getEndpoint(),
+                'conn'     => $from->resourceId, 'ck' => $comKey,
+            ]);
 
             $socketClients = $this->getAttachedSocketClients($webHook);
             if (!count($socketClients)) {
-                $this->io->text("[{$from->resourceId}] No client attached.");
+                $this->logger->info("No client attached.", ['conn' => $from->resourceId, 'ck' => $comKey]);
             }
             foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
-                $this->io->text(
-                    "[{$from->resourceId}] Inform {$socketClient->resourceId} for the new WebHook \"{$endpoint}\""
-                );
+                $this->logger->info(
+                    "Inform client for the new WebHook", [
+                    'client'   => $socketClient->resourceId,
+                    'endpoint' => $endpoint,
+                    'conn'     => $from->resourceId, 'ck' => $comKey,
+                ]);
                 $this->answer($socketClient, 'forwardAddWebHook', rand(100000, 999999), ['endpoint' => $webHook->getEndpoint()]);
             }
 
@@ -232,16 +230,24 @@ class Server implements MessageComponentInterface
         if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $endpoint)) {
             if ($this->isWebHookRegistered($webHook)) {
                 foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
-                    $this->io->text(
-                        "[{$from->resourceId}] Inform {$socketClient->resourceId} for the \"{$endpoint}\" WebHook deletion"
-                    );
-                    $this->answer($socketClient, 'forwardRemoveWebHook', rand(100000, 999999), ['endpoint' => $webHook->getEndpoint()]);
+                    $this->logger->info(
+                        "Inform client for the WebHook deletion", [
+                        'client'   => $socketClient->resourceId,
+                        'endpoint' => $endpoint,
+                        'conn'     => $from->resourceId, 'ck' => $comKey,
+                    ]);
+                    $this->answer($socketClient, 'forwardRemoveWebHook', rand(100000, 999999), [
+                        'endpoint' => $endpoint,
+                    ]);
                 }
                 $this->webHooks->removeElement($webHook);
                 $this->answerOk($from, $type, $comKey);
-                $this->io->text("[{$from->resourceId}] WebHook {$webHook->getEndpoint()} removed");
+                $this->logger->info("WebHook removed", [
+                    'endpoint' => $endpoint,
+                    'conn'     => $from->resourceId, 'ck' => $comKey,
+                ]);
             } else {
-                $this->answerError($from, $type, $comKey, '[REMOVE] WebHook was not registered');
+                $this->answerError($from, $type, $comKey, 'WebHook "' . $endpoint . '" was not registered');
             }
         } else {
             $this->answerError($from, $type, $comKey, '[REMOVE] WebHook was not found');
@@ -256,10 +262,13 @@ class Server implements MessageComponentInterface
                 $webHook->addClient($clientEntity);
                 $this->em->persist($webHook);
                 $this->em->flush();
-                $this->io->text("[{$from->resourceId}] Client attached to {$webHook->getEndpoint()}");
+                $this->logger->info("Client attached to endpoint", [
+                    'endpoint' => $webHook->getEndpoint(),
+                    'conn'     => $from->resourceId, 'ck' => $comKey,
+                ]);
                 $this->answerOk($from, $type, $comKey);
             } else {
-                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+                $this->answerError($from, $type, $comKey, 'WebHook "' . $msg['endpoint'] . '" was not registered');
             }
         } else {
             $this->answerError($from, $type, $comKey, 'WebHook was not found');
@@ -273,9 +282,12 @@ class Server implements MessageComponentInterface
                 $clientEntity = $this->clientEntities[$from->resourceId];
                 $webHook->removeClient($clientEntity);
                 $this->em->flush();
-                $this->io->text("[{$from->resourceId}] Client detached from {$webHook->getEndpoint()}");
+                $this->logger->info("Client detached from webhook", [
+                    'endpoint' => $webHook->getEndpoint(),
+                    'conn'     => $from->resourceId, 'ck' => $comKey,
+                ]);
             } else {
-                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+                $this->answerError($from, $type, $comKey, 'WebHook "' . $msg['endpoint'] . '" was not registered');
             }
         }
     }
@@ -301,21 +313,35 @@ class Server implements MessageComponentInterface
 
     private function receiveSendRequest(User $user, ConnectionInterface $from, array $msg, $type, $comKey)
     {
-        $this->io->text("[{$from->resourceId}] Notification received");
+        $request = $msg['request'];
+        $this->logger->info("Notification received", [
+            'endpoint' => $msg['endpoint'],
+            'request' => $msg['request'],
+            'conn'     => $from->resourceId, 'ck' => $comKey,
+        ]);
         if ($webHook = $this->getWebHook($user, $from, $type, $comKey, $msg['endpoint'])) {
             if ($this->isWebHookRegistered($webHook)) {
                 // unlock external service response
                 $this->answerOk($from, $type, $comKey);
 
                 // forward request to users
-                $request = $msg['request'];
-                foreach ($this->getAttachedSocketClients($webHook) as $socketClient) {
-                    $this->io->text("[{$from->resourceId}] Request sent to {$socketClient->resourceId}");
-                    $this->answer($socketClient, 'forwardRequest', $comKey, ['request' => $request]);
+                $socketClients = $this->getAttachedSocketClients($webHook);
+                if (count($socketClients)) {
+                    foreach ($socketClients as $socketClient) {
+                        $this->logger->info("Request forwarded to client", [
+                            'client' => $socketClient->resourceId,
+                            'conn'   => $from->resourceId, 'ck' => $comKey,
+                        ]);
+                        $this->answer($socketClient, 'forwardRequest', $comKey, ['request' => $request]);
+                    }
+                } else {
+                    $this->logger->info("No client attached.", ['conn' => $from->resourceId, 'ck' => $comKey]);
                 }
             } else {
-                $this->answerError($from, $type, $comKey, 'WebHook was not registered');
+                $this->answerError($from, $type, $comKey, 'WebHook "' . $msg['endpoint'] . '" was not registered');
             }
+        } else {
+            $this->answerError($from, $type, $comKey, 'No "' . $msg['endpoint'] . '" WebHook found.');
         }
     }
 
@@ -325,6 +351,7 @@ class Server implements MessageComponentInterface
         $user = $this->em->getRepository('AppBundle:User')->findOneBy(['secret' => $secret]);
         if (!$user) {
             $this->answerError($from, $type, $comKey, 'Invalid secret');
+
             return;
         }
         $this->em->refresh($user);
@@ -338,6 +365,9 @@ class Server implements MessageComponentInterface
             $config['web_hooks'][] = ['endpoint' => $webHook->getEndpoint()];
         }
         $this->answer($from, $type, $comKey, $config);
-        $this->io->text("[{$from->resourceId}] Configuration retrieved for user {$user->getUsername()}");
+        $this->logger->info("Configuration retrieved for user", [
+            'user' => $user->getUsername(),
+            'conn' => $from->resourceId, 'ck' => $comKey,
+        ]);
     }
 }

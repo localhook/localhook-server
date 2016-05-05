@@ -22,24 +22,23 @@ class WorkflowTest extends KernelTestCase
      */
     protected function setUp()
     {
-        self::bootKernel();
-        // TODO Load fixtures
-        $em = static::$kernel->getContainer()->get('doctrine.orm.default_entity_manager');
-        $metaData = $em->getMetadataFactory()->getAllMetadata();
-        if (!empty($metaData)) {
-            $tool = new SchemaTool($em);
-            $tool->dropSchema($metaData);
-            $tool->createSchema($metaData);
-            Fixtures::load(static::$kernel->getRootDir() . '/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
-        }
+//        self::bootKernel();
+//        // TODO Load fixtures
+//        $em = static::$kernel->getContainer()->get('doctrine.orm.default_entity_manager');
+//        $metaData = $em->getMetadataFactory()->getAllMetadata();
+//        if (!empty($metaData)) {
+//            $tool = new SchemaTool($em);
+//            $tool->dropSchema($metaData);
+//            $tool->createSchema($metaData);
+//            Fixtures::load(static::$kernel->getRootDir() . '/../src/AppBundle/DataFixtures/ORM/fixtures.yml', $em, ['providers' => [$this]]);
+//        }
     }
 
     public function testFullProcess()
     {
-
         $this->socketPort = static::$kernel->getContainer()->getParameter('socket_port');
 
-        $socketServerProcess = new Process('php app/console app:run-socket');
+        $socketServerProcess = new Process('php app/console app:run-socket -e test');
         $socketServerProcess->setTimeout(null)->start();
         $kernel = static::$kernel;
         $socketServerProcess->wait(function ($type, $buffer) use ($kernel, $socketServerProcess) {
@@ -62,7 +61,7 @@ class WorkflowTest extends KernelTestCase
                     // Simulate a notification
 
                     $simulateNotificationProcess = new Process(
-                        'php app/console app:simulate-notification webhook_1'
+                        'php app/console app:simulate-notification webhook_1 -e test'
                     );
                     $simulateNotificationProcess->setTimeout(null)->run();
                     $simulationOutput = $simulateNotificationProcess->getOutput();
