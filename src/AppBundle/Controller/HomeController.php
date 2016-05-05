@@ -21,7 +21,7 @@ class HomeController extends Controller
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('webhook_index');
         } else {
-            return $this->render('Home/index.html.twig');
+            return $this->render('home/index.html.twig');
         }
     }
 
@@ -35,7 +35,7 @@ class HomeController extends Controller
     public function getStartedAction()
     {
         if (!$this->isGranted('ROLE_USER')) {
-            return $this->render('Home/index.html.twig');
+            return $this->render('home/index.html.twig');
         }
 
         return $this->render('home/get-started.html.twig', [
