@@ -36,7 +36,7 @@ class RunSocketCommand extends ContainerAwareCommand
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
         $logger = $this->getContainer()->get('logger');
-        $socketUrl = $this->getContainer()->getParameter('socket_url');
+        $socketUrl = $this->getContainer()->getParameter('socket_server_url');
         $webUrl = $this->getContainer()->getParameter('web_server_url');
         $webHooks = $em->getRepository('AppBundle:WebHook')->findAll();
         $logger->info(count($webHooks) . ' webHook(s)');
