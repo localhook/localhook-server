@@ -124,7 +124,7 @@
             </thead>
             <tbody>
             {% for notificationData in notificationsData %}
-                {% include "webhook/_notificationRow.html.twig" %}
+                {% include "webhook/_notificationRow.html.twig"  with {notificationData:notificationData} only %}
             {% endfor %}
             </tbody>
         </table>
