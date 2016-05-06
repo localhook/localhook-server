@@ -40,7 +40,7 @@ class WorkflowTest extends WebTestCase
         $socketServerProcess->setTimeout(null)->start();
         $socketServerProcess->wait(function ($type, $buffer) use ($socketServerProcess) {
             if (Process::ERR === $type) {
-                self::dump('SOCKET OUT > ' . $buffer);
+                self::dump('SOCKET SERVER OUT > ' . $buffer);
                 if (strpos($buffer, 'Run socket server on port')) {
 
                     $client = static::createClient();
@@ -83,8 +83,6 @@ class WorkflowTest extends WebTestCase
                     $crawler = $client->click($link);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("Create a new forward")')->count());
 
-//                    $client->insulate();
-
                     $form = $crawler->selectButton('Submit')->form();
                     $form['web_hook[endpoint]'] = 'test';
                     $crawler = $client->submit($form);
@@ -94,13 +92,13 @@ class WorkflowTest extends WebTestCase
                     $this->assertNotNull($link);
                     $crawler = $client->click($link);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
-////                    // Start notification watcher
-////                    $watchNotificationProcess = new Process(
-////                        'bin/localhook delete-configuration; bin/localhook run test ' .
-////                        '"http://127.0.0.1/" --config-key="' . $serverSecret . '" --max=1 -vvv'
-////                    );
-////                    $watchNotificationProcess->setTimeout(null)->start();
-//
+                    // Start notification watcher
+//                    $watchNotificationProcess = new Process(
+//                        'bin/localhook delete-configuration; bin/localhook run test ' .
+//                        '"http://127.0.0.1/" --config-key="' . $secret . '" --max=1 -vvv'
+//                    );
+//                    $watchNotificationProcess->setTimeout(30)->start();
+
                     $link = $form = $crawler->selectLink('Simulate notification')->link();
                     $this->assertNotNull($link);
                     $crawler = $client->click($link);
@@ -108,6 +106,7 @@ class WorkflowTest extends WebTestCase
 //
 //                    while ($watchNotificationProcess->isRunning()) {
 //                        self::dump($watchNotificationProcess->getIncrementalOutput());
+//                        self::dump($watchNotificationProcess->getIncrementalErrorOutput());
 //                        // waiting for process to finish
 //                    }
 //
