@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "27ac93d08c48a0ba5f9b36f226781ddb",
-    "content-hash": "88fe79652d499950edccef97c8b37abe",
+    "hash": "20b388783fec44648f22d15103130ac2",
+    "content-hash": "5e2f62a1099b7939dbd673bef4608d4b",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1573,11 +1573,11 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "dev-master",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/localhook/localhook",
-                "reference": "60084300b94b4d727fba6d89f4f92d3eb4dfe6f1"
+                "url": "https://github.com/localhook/localhook.git",
+                "reference": "7ef715fe6f2c6d22f8c6371850122dfc6759a35d"
             },
             "require": {
                 "guzzlehttp/guzzle": "@stable",
@@ -1608,7 +1608,8 @@
                     "email": "lucas@cherifi.info"
                 }
             ],
-            "time": "2016-05-05 03:39:48"
+            "description": "The Localhook client",
+            "time": "2016-05-06 11:25:41"
         },
         {
             "name": "monolog/monolog",
@@ -4623,7 +4624,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "localhook/localhook": 20,
         "friendsofsymfony/user-bundle": 20
     },
     "prefer-stable": false,
