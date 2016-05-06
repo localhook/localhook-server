@@ -3,12 +3,6 @@
 #parameters:
 
 services:
-    app.twig_extension:
-        class: AppBundle\Twig\AppExtension
-        public: false
-        tags:
-            - { name: twig.extension }
-
     socket_admin_client:
         class: AppBundle\Ratchet\AdminClient
         arguments:
