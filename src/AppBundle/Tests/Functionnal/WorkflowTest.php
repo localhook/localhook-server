@@ -7,7 +7,7 @@ use Nelmio\Alice\Fixtures;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Process\Process;
 
-class WebHookControllerTest extends WebTestCase
+class WorkflowTest extends WebTestCase
 {
     /** @var string */
     private $socketPort;
