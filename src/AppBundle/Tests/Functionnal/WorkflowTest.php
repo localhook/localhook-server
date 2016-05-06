@@ -120,10 +120,9 @@ class WorkflowTest extends WebTestCase
                     $crawler = $client->click($link);
                     $this->assertEquals(2, $crawler->filter('table#notifications>tbody>tr')->count());
 
-//                    $link = $form = $crawler->selectLink('Clear notifications')->link();
-//                    $this->assertNotNull($link);
-//                    $crawler = $client->click($link);
-//                    $this->assertEquals(0, $crawler->filter('table#notifications')->count());
+                    $form = $crawler->selectButton('Clear notifications')->form();
+                    $crawler = $client->submit($form);
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
 //
                     $link = $form = $crawler->selectLink('Back to the list of all endpoints')->link();
                     $this->assertNotNull($link);
@@ -132,7 +131,8 @@ class WorkflowTest extends WebTestCase
 
 //                    $form = $crawler->selectButton('Delete test')->form();
 //                    $crawler = $client->submit($form);
-//                    $this->assertEquals(1, $crawler->filter('html:contains("Your endpoints list is empty")')->count());
+//                    self::dump($crawler->text());die;
+                    //$this->assertEquals(1, $crawler->filter('html:contains("Your endpoints list is empty")')->count());
 
 //                    $this->assertEquals('', $socketServerProcess->getIncrementalErrorOutput());
                     $socketServerProcess->stop();
