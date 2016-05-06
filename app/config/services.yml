@@ -3,6 +3,9 @@
 #parameters:
 
 services:
+    # Nullify this service. It is deprecated and raises an error on SensioLabs Insight
+    twig.extension.actions:
+        class: AppBundle\Twig\NullExtension
     socket_admin_client:
         class: AppBundle\Ratchet\AdminClient
         arguments:
