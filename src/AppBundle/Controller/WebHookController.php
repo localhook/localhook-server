@@ -89,7 +89,7 @@ class WebHookController extends Controller
                 });
             });
 
-            return $this->redirectToRoute('webhook_index', ['id' => $webHook->getId()]);
+            return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
         }
 
         return $this->render('webhook/new.html.twig', [
@@ -151,7 +151,7 @@ class WebHookController extends Controller
      */
     public function simulateNotificationAction(WebHook $webHook)
     {
-        $this->get('request_simulator')->simulate($webHook->getEndpoint());
+        $this->get('request_simulator')->simulate($webHook->getUser()->getUsername(), $webHook->getEndpoint());
 
         return $this->redirectToRoute('webhook_show', ['id' => $webHook->getId()]);
     }
@@ -181,6 +181,7 @@ class WebHookController extends Controller
             'webHook'                => $webHook,
             'notificationsData'      => $notificationsData,
             'clearNotificationsForm' => $this->createClearNotificationsForm($webHook)->createView(),
+            'socket_secret' => $this->getSocketSecret(),
         ]);
     }
 
@@ -266,5 +267,12 @@ class WebHookController extends Controller
                     ->add('id', HiddenType::class)
                     ->setMethod('DELETE')
                     ->getForm();
+    }
+
+    private function getSocketSecret()
+    {
+        $token = [$this->getParameter('socket_server_url'), $this->getUser()->getSecret()];
+
+        return base64_encode(json_encode($token));
     }
 }

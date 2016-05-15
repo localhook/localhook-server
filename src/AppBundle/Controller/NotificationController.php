@@ -18,18 +18,21 @@ class NotificationController extends Controller
     private $socketAdminClient;
 
     /**
-     * @Route("{endpoint}/notifications", name="notifications")
+     * @Route("{username}/{endpoint}", name="notifications")
      * @Method({"GET", "POST", "PUT"})
      * @param Request $request
      * @param string  $endpoint
      *
      * @return JsonResponse
      */
-    public function handleAction(Request $request, $endpoint)
+    public function handleAction(Request $request, $username, $endpoint)
     {
         $em = $this->get('doctrine.orm.default_entity_manager');
-        $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy(['endpoint' => $endpoint]);
-
+        $user = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $webHook = $em->getRepository('AppBundle:WebHook')->findOneBy([
+            'endpoint' => $endpoint,
+            'user'     => $user,
+        ]);
         if (!$webHook) {
             throw new NotFoundHttpException('WebHook was not found.');
         }

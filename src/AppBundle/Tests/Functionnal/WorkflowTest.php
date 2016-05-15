@@ -78,7 +78,7 @@ class WorkflowTest extends WebTestCase
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("How does it work")')->count());
                     $secret = $crawler->filter('#server-secret')->attr('value');
 
-                    $link = $form = $crawler->selectLink('Create a new webhook')->link();
+                    $link = $form = $crawler->selectLink('Create a forward')->link();
                     $this->assertNotNull($link);
                     $crawler = $client->click($link);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("Create a new forward")')->count());
@@ -86,12 +86,8 @@ class WorkflowTest extends WebTestCase
                     $form = $crawler->selectButton('Submit')->form();
                     $form['web_hook[endpoint]'] = 'test';
                     $crawler = $client->submit($form);
-                    $this->assertGreaterThan(0, $crawler->filter('html:contains("/test/notifications")')->count());
+                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL")')->count());
 
-                    $link = $form = $crawler->selectLink('View test')->link();
-                    $this->assertNotNull($link);
-                    $crawler = $client->click($link);
-                    $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
                     // Start notification watcher
 //                    $watchNotificationProcess = new Process(
 //                        'bin/localhook delete-configuration; bin/localhook run test ' .
@@ -123,7 +119,7 @@ class WorkflowTest extends WebTestCase
                     $crawler = $client->submit($form);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("What a fresh URL!")')->count());
 //
-                    $link = $form = $crawler->selectLink('Back to the list of all endpoints')->link();
+                    $link = $form = $crawler->selectLink('Back to the list of all forwards')->link();
                     $this->assertNotNull($link);
                     $crawler = $client->click($link);
                     $this->assertEquals(1, $crawler->filter('html:contains("List of your forwards")')->count());
