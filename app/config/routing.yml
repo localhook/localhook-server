@@ -1,6 +1,14 @@
 fos_user:
     resource: "@FOSUserBundle/Resources/config/routing/all.xml"
 
-app:
-    resource: "@AppBundle/Controller/"
+app_webhook:
+    resource: "@AppBundle/Controller/WebHookController.php"
+    type:     annotation
+
+app_notifications:
+    resource: "@AppBundle/Controller/NotificationController.php"
+    type:     annotation
+
+app_home:
+    resource: "@AppBundle/Controller/HomeController.php"
     type:     annotation

@@ -88,11 +88,11 @@
     <p>
         <a class="btn btn-default btn-sm" href="{{ path('webhook_index') }}">
             <i class="glyphicon glyphicon-backward"></i>
-            Back to the list of all endpoints
+            Back to the list of all forwards
         </a>
     </p>
 
-    <h1><i class="glyphicon glyphicon-screenshot"></i> {{ url('notifications', {endpoint: webHook.endpoint}) }}</h1>
+    <h1><i class="glyphicon glyphicon-screenshot"></i> {{ url('notifications', {'username': app.user.username, endpoint: webHook.endpoint}) }}</h1>
 
 
 
@@ -138,4 +138,38 @@
             </p>
         </div>
     {% endif %}
+
+    <h1><i class="glyphicon glyphicon-education"></i> Configure this forward on your local host</h1>
+
+    <div class="well">
+
+        <h3>1) Install the client on you computer</h3>
+        <code>
+            $ curl -OSL https https://git.io/vwu9e -o localhook.phar && chmod +x localhook.phar
+        </code><br>
+        <code>
+            $ sudo mv localhook.phar /usr/local/bin/localhook
+        </code>
+
+        <h3>2) Copy your Localhook secret</h3>
+
+        <div class="input-group">
+            <span class="input-group-addon">Your secret:</span>
+            <input type="text" class="form-control" id="server-secret" value="{{ socket_secret }}" readonly/>
+            <span class="input-group-btn">
+              <button class="btn btn-default btn-clipboard" type="button"
+                      data-clipboard-target="#server-secret">
+                  Copy
+              </button>
+            </span>
+        </div>
+
+        <h3>3) Use the client</h3>
+
+        <code>
+            $ localhook run
+        </code>
+        <p>Fill the password you just copied.</p>
+    </div>
+
 {% endblock %}
