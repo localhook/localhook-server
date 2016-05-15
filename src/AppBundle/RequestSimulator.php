@@ -48,6 +48,7 @@ class RequestSimulator
     }
 
     /**
+     * @param string $username
      * @param string $endpoint
      *
      * @param string $method
@@ -56,9 +57,9 @@ class RequestSimulator
      * @param string $body
      *
      * @return mixed|ResponseInterface
-     *
      */
     public function simulate(
+        $username,
         $endpoint,
         $method = 'POST',
         $query = [
@@ -71,12 +72,15 @@ class RequestSimulator
         $body = 'post_param_1=post_value_1&post_param_2=post_value_2'
     ) {
 
-        $url = $this->notificationsPrefixUrl . '/' . $endpoint . '/notifications?' . http_build_query($query);
+        $url = $this->router->generate('notifications', array_merge([
+            'username' => $username,
+            'endpoint' => $endpoint,
+        ], $query));
+
         if ($this->io) {
             $this->io->comment('URL: ' . $url);
         }
 
-        $url = $this->router->generate('notifications', ['endpoint' => $endpoint]);
         $server = [];
         if ($this->requestStack && $currentRequest = $this->requestStack->getCurrentRequest()) {
             $server = $currentRequest->server->all();
@@ -90,9 +94,13 @@ class RequestSimulator
 
     public function replay(Request $baseRequest, Notification $notification)
     {
-        $endpoint = $notification->getWebHook()->getEndpoint();
+        $webHook = $notification->getWebHook();
+        $endpoint = $webHook->getEndpoint();
         $content = json_decode($notification->getContent(), true);
-        $url = $this->router->generate('notifications', ['endpoint' => $endpoint]);
+        $query = array_merge([
+            'username' => $webHook->getUser()->getUsername(), 'endpoint' => $endpoint,
+        ], $content['query']);
+        $url = $this->router->generate('notifications', $query);
         $request = Request::create($url, $content['method'], [], [], [], $baseRequest->server->all(), $content['body']);
         $request->headers->replace($content['headers']);
         $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST);
