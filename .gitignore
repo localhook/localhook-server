@@ -12,6 +12,9 @@
 /bin/
 /composer.phar
 
+# coverage
+/app/build
+
 # Couscous
 .couscous
 
