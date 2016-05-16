@@ -143,33 +143,22 @@
 
     <div class="well">
 
-        <h3>1) Install the client on you computer</h3>
-        <code>
-            $ curl -OSL https https://git.io/vwu9e -o localhook.phar && chmod +x localhook.phar
-        </code><br>
-        <code>
-            $ sudo mv localhook.phar /usr/local/bin/localhook
-        </code>
+        <h3>1) If it is not already done, install and configure the client on your local environment</h3>
+        <pre><code class="bash" id="install-command">curl -OSL https://git.io/vwu9e -o localhook.phar && chmod +x localhook.phar && sudo mv localhook.phar /usr/local/bin/localhook && localhook auto-configure "{{ socket_secret }}"</code></pre>
+        <button class="btn btn-xs btn-default btn-clipboard" type="button"
+                data-clipboard-target="#install-command">
+            Copy this install command
+        </button>
+        <br>
 
-        <h3>2) Copy your Localhook secret</h3>
+        <h3>2) Run the client</h3>
+        <pre><code class="bash" id="run-command">localhook run</code></pre>
+        <button class="btn btn-xs btn-default btn-clipboard" type="button"
+                data-clipboard-target="#run-command">
+            Copy this run command
+        </button>
 
-        <div class="input-group">
-            <span class="input-group-addon">Your secret:</span>
-            <input type="text" class="form-control" id="server-secret" value="{{ socket_secret }}" readonly/>
-            <span class="input-group-btn">
-              <button class="btn btn-default btn-clipboard" type="button"
-                      data-clipboard-target="#server-secret">
-                  Copy
-              </button>
-            </span>
-        </div>
-
-        <h3>3) Use the client</h3>
-
-        <code>
-            $ localhook run
-        </code>
-        <p>Fill the password you just copied.</p>
+        <p>The client will automatically detect the new forward.</p>
     </div>
 
 {% endblock %}

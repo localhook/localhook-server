@@ -30,6 +30,8 @@
           media="screen">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"
           media="screen">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/solarized-dark.min.css"
+          media="screen">
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -85,9 +87,14 @@
             integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/languages/bash.min.js"></script>
     <script>
         $(function() {
             new Clipboard('.btn-clipboard');
+            $('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
         });
     </script>
 {% endblock %}
