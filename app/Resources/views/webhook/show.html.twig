@@ -144,7 +144,7 @@
     <div class="well">
 
         <h3>1) If it is not already done, install and configure the client on your local environment</h3>
-        <pre><code class="bash" id="install-command">curl -OSL https://git.io/vwu9e -o localhook.phar && chmod +x localhook.phar && sudo mv localhook.phar /usr/local/bin/localhook && localhook auto-configure "{{ socket_secret }}"</code></pre>
+        <pre><code class="bash" id="install-command">curl -SLo localhook https://git.io/vwu9e && chmod +x localhook && sudo mv localhook /usr/local/bin/ && localhook auto-configure "{{ socket_secret }}"</code></pre>
         <button class="btn btn-xs btn-default btn-clipboard" type="button"
                 data-clipboard-target="#install-command">
             Copy this install command

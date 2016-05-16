@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "974b9073822e8d5fa66aee794a3dfd2e",
-    "content-hash": "f0ab7ac7068b91161575478fda4d00b9",
+    "hash": "4a43e163e8ee33cb4895c8b0824bcdcd",
+    "content-hash": "8b1eb542e524f23edb0924095469723b",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1573,16 +1573,16 @@
         },
         {
             "name": "localhook/localhook",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/localhook/localhook.git",
-                "reference": "78477b3a1c597871451cee03ffcdc8c7ed1598a1"
+                "reference": "a186727ea2bd313935c937c683688685dec0a589"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/localhook/localhook/zipball/78477b3a1c597871451cee03ffcdc8c7ed1598a1",
-                "reference": "78477b3a1c597871451cee03ffcdc8c7ed1598a1",
+                "url": "https://api.github.com/repos/localhook/localhook/zipball/a186727ea2bd313935c937c683688685dec0a589",
+                "reference": "a186727ea2bd313935c937c683688685dec0a589",
                 "shasum": ""
             },
             "require": {
@@ -1616,7 +1616,7 @@
                 }
             ],
             "description": "The Localhook client",
-            "time": "2016-05-16 00:17:31"
+            "time": "2016-05-16 01:49:28"
         },
         {
             "name": "monolog/monolog",
