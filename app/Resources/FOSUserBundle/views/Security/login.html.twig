@@ -3,19 +3,27 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 {% block fos_user_content %}
+
+    {% if error %}
+        <div class="alert alert-warning">
+            <i class="fa fa-exclamation-triangle fa-4x" style="vertical-align: middle;margin-right: 20px;"></i>
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
     <div class="row">
         <div class="col-lg-5 well">
-            <h2><i class="fa fa-github"></i> Login for Github users</h2>
+            <h2><i class="fa fa-github"></i> Login with Github account</h2>
             <br>
             <p>If you have a Github account, use it to connect to Localhook.</p>
-            <br><br><br><br>
+            <p>Easy as there is no form to fill, just one click. Pretty cool.</p>
+            <br>
             <div class="others text-center">
-                {% if error is defined and error %}
-                    <span>{{ error }}</span>
-                {% endif %}
                 {% for owner in hwi_oauth_resource_owners() %}
                     {% if owner == 'github' %}
-                        <a href="{{ hwi_oauth_login_url(owner) }}" class="btn btn-primary"><i class="fa fa-github"></i> Login with your Github account</a>
+                        <a href="{{ hwi_oauth_login_url(owner) }}" class="btn btn-primary">
+                            <i class="fa fa-github fa-4x" style="vertical-align: middle; margin-right: 10px;"></i> Login with your Github account
+                        </a>
                     {% else %}
                         <a href="{{ hwi_oauth_login_url(owner) }}">{{ owner }}</a> <br />
                     {% endif %}
@@ -23,15 +31,10 @@
             </div>
             <br>
             <br>
-            <br>
         </div>
-        <div class="col-lg-5 well col-lg-offset-1">
+        <div class="col-lg-5 well col-lg-offset-2">
             <h2 class="text-center"><i class="fa fa-sign-in"></i> Login for other users</h2>
             <p>Login with your email/username and password.</p>
-
-            {% if error %}
-                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% endif %}
 
             <form class="form" action="{{ path("fos_user_security_check") }}" method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
