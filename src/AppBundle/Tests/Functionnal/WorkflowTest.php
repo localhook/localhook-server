@@ -76,7 +76,6 @@ class WorkflowTest extends WebTestCase
                     $this->assertNotNull($link);
                     $crawler = $client->click($link);
                     $this->assertGreaterThan(0, $crawler->filter('html:contains("How does it work")')->count());
-                    $secret = $crawler->filter('#server-secret')->attr('value');
 
                     $link = $form = $crawler->selectLink('Create a forward')->link();
                     $this->assertNotNull($link);
