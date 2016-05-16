@@ -76,3 +76,18 @@ fos_user:
     db_driver: orm
     firewall_name: main
     user_class: AppBundle\Entity\User
+
+hwi_oauth:
+    firewall_names: [main]
+    connect:
+        account_connector: app.github.user_provider
+    fosub:
+        username_iterations: 30
+        properties:
+            github:    githubId
+    resource_owners:
+        github:
+            type:                github
+            client_id:           "%github_client_id%"
+            client_secret:       "%github_client_secret%"
+            scope:               "user:email"

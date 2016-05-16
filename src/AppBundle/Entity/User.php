@@ -33,6 +33,13 @@ class User extends BaseUser
      */
     private $secret;
 
+    /**
+     * @ORM\Column(name="github_id", type="string", length=255, nullable=true)
+     */
+    private $githubId;
+
+    private $githubAccessToken;
+
     public function __construct()
     {
         parent::__construct();
@@ -84,5 +91,37 @@ class User extends BaseUser
     public function getSalt()
     {
         return null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGithubId()
+    {
+        return $this->githubId;
+    }
+
+    /**
+     * @param mixed $githubId
+     */
+    public function setGithubId($githubId)
+    {
+        $this->githubId = $githubId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGithubAccessToken()
+    {
+        return $this->githubAccessToken;
+    }
+
+    /**
+     * @param mixed $githubAccessToken
+     */
+    public function setGithubAccessToken($githubAccessToken)
+    {
+        $this->githubAccessToken = $githubAccessToken;
     }
 }

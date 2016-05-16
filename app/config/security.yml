@@ -26,11 +26,21 @@ security:
                 csrf_token_generator: security.csrf.token_manager
             logout:       true
             anonymous:    true
+            oauth:
+                resource_owners:
+                   github:          "/login/check-github"
+                login_path:        /login
+                use_forward:       false
+                failure_path:      /login
+
+                oauth_user_provider:
+                    service: hwi_oauth.user.provider.fosub_bridge
 
     access_control:
-        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^.*/notifications, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/.+, roles: ROLE_USER }
+      - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/webhook, role: ROLE_USER }
+      - { path: ^/get-started, role: ROLE_USER }
+      - { path: ^.*/notifications, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/.+, roles: ROLE_USER }
