@@ -16,7 +16,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('apple-icon-144x144.png') }}">
     <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('apple-icon-152x152.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-icon-180x180.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('android-icon-192x192.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon-96x96.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
@@ -30,8 +30,11 @@
           media="screen">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"
           media="screen">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/solarized-dark.min.css"
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/solarized-dark.min.css"
           media="screen">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -62,7 +65,8 @@
                 <p>
                     Localhook {{ 'now' | date('Y') }}
                     -
-                    <a target="_blank" href="https://raw.githubusercontent.com/localhook/localhook-server/master/LICENSE">
+                    <a target="_blank"
+                       href="https://raw.githubusercontent.com/localhook/localhook-server/master/LICENSE">
                         MIT licence
                     </a>
                     -
@@ -90,9 +94,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/languages/bash.min.js"></script>
     <script>
-        $(function() {
+        $(function () {
             new Clipboard('.btn-clipboard');
-            $('pre code').each(function(i, block) {
+            $('pre code').each(function (i, block) {
                 hljs.highlightBlock(block);
             });
         });

@@ -29,12 +29,12 @@ security:
             oauth:
                 resource_owners:
                    github:          "/login/check-github"
-                login_path:        /login
+                login_path:        /login/connect
                 use_forward:       false
-                failure_path:      /login
+                failure_path:      /login/connect
 
                 oauth_user_provider:
-                    service: hwi_oauth.user.provider.fosub_bridge
+                    service: app.github.user_provider
 
     access_control:
       - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }

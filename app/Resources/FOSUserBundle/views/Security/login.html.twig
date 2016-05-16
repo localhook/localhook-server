@@ -4,8 +4,29 @@
 
 {% block fos_user_content %}
     <div class="row">
-        <div class="col-lg-6 well col-lg-offset-3">
-            <h2 class="text-center">Login</h4>
+        <div class="col-lg-5 well">
+            <h2><i class="fa fa-github"></i> Login for Github users</h2>
+            <br>
+            <p>If you have a Github account, use it to connect to Localhook.</p>
+            <br><br><br><br>
+            <div class="others text-center">
+                {% if error is defined and error %}
+                    <span>{{ error }}</span>
+                {% endif %}
+                {% for owner in hwi_oauth_resource_owners() %}
+                    {% if owner == 'github' %}
+                        <a href="{{ hwi_oauth_login_url(owner) }}" class="btn btn-primary"><i class="fa fa-github"></i> Login with your Github account</a>
+                    {% else %}
+                        <a href="{{ hwi_oauth_login_url(owner) }}">{{ owner }}</a> <br />
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <br>
+            <br>
+            <br>
+        </div>
+        <div class="col-lg-5 well col-lg-offset-1">
+            <h2 class="text-center"><i class="fa fa-sign-in"></i> Login for other users</h2>
             <p>Login with your email/username and password.</p>
 
             {% if error %}
@@ -41,9 +62,9 @@
                     <button class="btn btn-success" id="_submit" name="_submit">
                         {{ 'security.login.submit'|trans }}
                     </button>
+                    <br>
+                <a href="{{ path('fos_user_registration_register') }}">Not already registered?</a>
                 </p>
-
-                <p><a href="{{ path('fos_user_registration_register') }}">Not already registered?</a></p>
             </form>
         </div>
     </div>

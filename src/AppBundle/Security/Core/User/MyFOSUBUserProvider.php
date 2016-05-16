@@ -14,8 +14,10 @@ class MyFOSUBUserProvider extends BaseFOSUBProvider
      */
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
+        /** @var User $user */
+
         // get property from provider configuration by provider name
-        // , it will return `facebook_id` in that case (see service definition below)
+        // , it will return `github_id` in that case (see service definition below)
         $property = $this->getProperty($response);
         $username = $response->getUsername(); // get the unique user identifier
 
@@ -29,8 +31,6 @@ class MyFOSUBUserProvider extends BaseFOSUBProvider
         }
         //we connect current user, set current user id and token
         // ...
-        $secret = sha1(uniqid(rand(), true));
-        $user->setSecret($secret);
         $this->userManager->updateUser($user);
     }
 
@@ -44,13 +44,16 @@ class MyFOSUBUserProvider extends BaseFOSUBProvider
 
         // if null just create new user and set it properties
         if (null === $user) {
-            dump($response);die;
             $username = $response->getRealName();
             $user = new User();
             $user->setUsername($username);
-
-            // ... save user to database
-
+            $user->setGithubAccessToken($response->getAccessToken());
+            $user->setEmail($response->getEmail());
+            $user->setEnabled(true);
+            $password = substr(sha1(uniqid(rand(), true)), 0, 16);
+            $user->setPassword($password);
+            $secret = sha1(uniqid(rand(), true));
+            $user->setSecret($secret);
             return $user;
         }
         // else update access token of existing user
