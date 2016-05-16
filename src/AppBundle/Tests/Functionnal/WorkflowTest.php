@@ -91,7 +91,7 @@ class WorkflowTest extends WebTestCase
                     // Start notification watcher
 //                    $watchNotificationProcess = new Process(
 //                        'bin/localhook delete-configuration; bin/localhook run test ' .
-//                        '"http://127.0.0.1/" --config-key="' . $secret . '" --max=1 -vvv'
+//                        '"http://127.0.0.1/" --secret="' . $secret . '" --max=1 -vvv'
 //                    );
 //                    $watchNotificationProcess->setTimeout(30)->start();
 
