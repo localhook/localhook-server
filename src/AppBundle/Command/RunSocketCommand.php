@@ -31,7 +31,25 @@ class RunSocketCommand extends ContainerAwareCommand
     {
         $this->io = new SymfonyStyle($input, $output);
         $this->io->block('Running server...');
-        $this->io->note('for more verbosity, add "-vv" or "-vvv" end the end of this command.');
+        $verbosity = $this->io->getVerbosity();
+        switch ($verbosity) {
+            case 16:
+                $verbosity = 'quiet';
+                break;
+            case 32:
+                $verbosity = 'normal';
+                break;
+            case 64:
+                $verbosity = 'verbose';
+                break;
+            case 128:
+                $verbosity = 'very_verbose';
+                break;
+            case 256:
+                $verbosity = 'debug';
+                break;
+        }
+        $this->io->note('Verbosity is "' . $verbosity . '". To set verbosity, add "-v", "-vv" or "-vvv" end the end of this command.');
         $this->socketPort = $this->getContainer()->getParameter('socket_port');
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
