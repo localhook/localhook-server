@@ -25,7 +25,7 @@
         "stof/doctrine-extensions-bundle": "^1.2",
         "guzzlehttp/guzzle": "^6.2",
         "cboden/ratchet": "^0.3.4",
-        "localhook/localhook": "dev-master",
+        "localhook/localhook": "dev-ws-client-migration",
         "friendsofsymfony/user-bundle": "~2.0@dev"
     },
     "require-dev": {
