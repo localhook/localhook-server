@@ -49,7 +49,7 @@ class RunSocketCommand extends ContainerAwareCommand
                 $verbosity = 'debug';
                 break;
         }
-        $this->io->note('Verbosity is "' . $verbosity . '". To set verbosity, add "-v", "-vv" or "-vvv" end the end of this command.');
+        $this->io->note('Verbosity is "' . $verbosity . '". To change verbosity, add "-v", "-vv" or "-vvv" end the end of this command.');
         $this->socketPort = $this->getContainer()->getParameter('socket_port');
 
         $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
