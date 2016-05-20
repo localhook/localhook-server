@@ -26,8 +26,7 @@
         "guzzlehttp/guzzle": "^6.2",
         "cboden/ratchet": "^0.3.4",
         "localhook/localhook": "dev-master",
-        "friendsofsymfony/user-bundle": "~2.0@dev",
-        "textalk/websocket": "^1.2"
+        "friendsofsymfony/user-bundle": "~2.0@dev"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
