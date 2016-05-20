@@ -2,7 +2,7 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Ratchet\Server;
+use AppBundle\Websocket\Server;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
@@ -49,16 +49,20 @@ class RunSocketCommand extends ContainerAwareCommand
                 $verbosity = 'debug';
                 break;
         }
+        $container = $this->getContainer();
         $this->io->note('Verbosity is "' . $verbosity . '". To change verbosity, add "-v", "-vv" or "-vvv" end the end of this command.');
         $this->socketPort = $this->getContainer()->getParameter('socket_port');
 
-        $em = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-        $logger = $this->getContainer()->get('logger');
-        $socketUrl = $this->getContainer()->getParameter('socket_server_url');
-        $webUrl = $this->getContainer()->getParameter('web_server_url');
+        $em = $container->get('doctrine.orm.default_entity_manager');
+        $logger = $container->get('logger');
+        $router = $container->get('router');
+        $socketUrl = $container->getParameter('socket_server_url');
+        $webUrl = $container->getParameter('web_server_url');
+        $scheme = $container->getParameter('scheme');
+        $notificationsPrefixUrl = $container->getParameter('notifications_prefix_url');
         $webHooks = $em->getRepository('AppBundle:WebHook')->findAll();
         $logger->info(count($webHooks) . ' webHook(s)');
-        $server = new Server($em, $webHooks, $webUrl, $socketUrl, $logger);
+        $server = new Server($em, $webHooks, $webUrl, $socketUrl, $logger, $router, $notificationsPrefixUrl, $scheme);
 
         $this->killExistingSocketServer();
 

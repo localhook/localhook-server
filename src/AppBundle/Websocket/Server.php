@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\Ratchet;
+namespace AppBundle\Websocket;
 
 use AppBundle\Entity\Client;
 use AppBundle\Entity\User;
@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use SplObjectStorage;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class Server implements MessageComponentInterface
 {
@@ -32,17 +33,27 @@ class Server implements MessageComponentInterface
     /** @var string */
     private $webUrl;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
+
+    /** @var Router */
+    private $router;
+
+    /** @var string */
+    private $notificationsPrefixUrl;
+
+    /** @var string */
+    private $scheme;
 
     public function __construct(
         EntityManager $em,
         $webHooks,
         $webUrl,
         $socketUrl,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Router $router,
+        $notificationsPrefixUrl,
+        $scheme
     ) {
         $this->em = $em;
         $this->webHooks = new ArrayCollection($webHooks);
@@ -51,6 +62,9 @@ class Server implements MessageComponentInterface
         $this->socketUrl = $socketUrl;
         $this->webUrl = $webUrl;
         $this->logger = $logger;
+        $this->router = $router;
+        $this->notificationsPrefixUrl = $notificationsPrefixUrl;
+        $this->scheme = $scheme;
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -266,7 +280,12 @@ class Server implements MessageComponentInterface
                     'endpoint' => $webHook->getEndpoint(),
                     'conn'     => $from->resourceId, 'ck' => $comKey,
                 ]);
-                $this->answerOk($from, $type, $comKey);
+                $this->answer($from, $type, $comKey, [
+                    'external_url' => ($this->scheme == 'https' ? '' : $this->notificationsPrefixUrl . '/') . $this->router->generate('notifications', [
+                            'username' => $webHook->getUser()->getUsername(),
+                            'endpoint' => $webHook->getEndpoint(),
+                        ], Router::RELATIVE_PATH),
+                ]);
             } else {
                 $this->answerError($from, $type, $comKey, 'WebHook "' . $msg['endpoint'] . '" was not registered');
             }

@@ -5,7 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Notification;
 use AppBundle\Entity\User;
 use AppBundle\Entity\WebHook;
-use AppBundle\Ratchet\AdminClient;
+use AppBundle\Websocket\AdminClient;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;

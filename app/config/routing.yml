@@ -4,11 +4,14 @@ fos_user:
 app_webhook:
     resource: "@AppBundle/Controller/WebHookController.php"
     type:     annotation
+    schemes:  ["%scheme%"]
 
 app_notifications:
     resource: "@AppBundle/Controller/NotificationController.php"
     type:     annotation
+    schemes:  ["%scheme%"]
 
 app_home:
     resource: "@AppBundle/Controller/HomeController.php"
     type:     annotation
+    schemes:  ["%scheme%"]

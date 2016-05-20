@@ -10,6 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  * @ORM\Table()
  * @ORM\Entity()
+ * TODO http://stackoverflow.com/questions/25810738/unique-values-for-two-columns-in-doctrine
  */
 class WebHook
 {

@@ -1,31 +1,20 @@
 <?php
 
-namespace AppBundle\Ratchet;
+namespace AppBundle\Websocket;
 
 use AppBundle\Entity\WebHook;
 use Exception;
-use Localhook\Localhook\Ratchet\AbstractClient;
-use Localhook\Localhook\Ratchet\ClientInterface;
+use Localhook\Localhook\Websocket\AbstractClient;
 
-class AdminClient extends AbstractClient implements ClientInterface
+class AdminClient extends AbstractClient
 {
-    public function __construct($url)
-    {
-        parent::__construct($url);
-    }
-
     public function routeInputEvents($type, $msg, $comKey)
     {
         switch ($type) {
-            case '_sendRequest':
-                $this->defaultReceive($msg, $comKey);
-                break;
             case '_addWebHook':
-                $this->defaultReceive($msg, $comKey);
-                break;
             case '_removeWebHook':
-                $this->defaultReceive($msg, $comKey);
-                break;
+            case '_sendRequest':
+                return $this->defaultReceive($msg, $comKey);
             default:
                 throw new Exception('Type "' . $type . '" not managed');
         }

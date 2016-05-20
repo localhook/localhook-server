@@ -4,12 +4,12 @@
 
 services:
     socket_admin_client:
-        class: AppBundle\Ratchet\AdminClient
+        class: AppBundle\Websocket\AdminClient
         arguments:
           - "%socket_server_url%"
 
     socket_user_client:
-        class: Localhook\Localhook\Ratchet\UserClient
+        class: Localhook\Localhook\Websocket\UserClient
         arguments:
           - "%socket_server_url%"
 

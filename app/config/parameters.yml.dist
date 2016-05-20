@@ -24,3 +24,4 @@ parameters:
     notifications_prefix_url: http://127.0.0.1:8000
     socket_server_url: 'ws://127.0.0.1:1337'
     web_server_url: 'http://127.0.0.1:8000'
+    scheme: 'https' # use http if you dont have SSL enabled on website
