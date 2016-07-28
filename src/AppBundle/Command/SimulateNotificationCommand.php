@@ -17,6 +17,7 @@ class SimulateNotificationCommand extends ContainerAwareCommand
     {
         $this
             ->setName('app:simulate-notification')
+            ->addArgument('user', InputArgument::REQUIRED, 'The endpoint')
             ->addArgument('endpoint', InputArgument::REQUIRED, 'The endpoint')
             ->setDescription('Simulate a notification');
     }
@@ -30,16 +31,13 @@ class SimulateNotificationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-        $endpoint = $input->getArgument('endpoint');
-
         try {
-            $this->getContainer()->get('request_simulator')->simulate($endpoint);
+            $this->getContainer()->get('request_simulator')->simulate($input->getArgument('user'), $input->getArgument('endpoint'));
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
-                $this->output->writeln('INVALID RESPONSE CODE: ' . $e->getResponse()->getStatusCode());
+                $output->writeln('INVALID RESPONSE CODE: ' . $e->getResponse()->getStatusCode());
             }
         }
-        $this->output->writeln('Sent!');
+        $output->writeln('Sent!');
     }
 }
